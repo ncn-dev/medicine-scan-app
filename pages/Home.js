@@ -37,7 +37,7 @@ export default function HomeScreen({ navigation }) {
         {/*ปุ่มไปหน้าภัดไป*/}
         <View style={{ marginTop: -20, paddingHorizontal: 60 }}>
           <TouchableOpacity
-            onPress={() => navigation.navigate("NextScreen")}
+            onPress={() => navigation.navigate("Login")}
             style={{
               backgroundColor: "#18253B",
               paddingVertical: 20,

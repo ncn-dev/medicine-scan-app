@@ -8,6 +8,8 @@ import { Image } from "react-native";
 import HomeScreen from "./pages/Home";
 import NextScreen from "./pages/NextScreen";
 import PharmacistHomeScreen from "./pages/Pharamacist";
+import LoginScreen from "./pages/LoginScreen";
+import RegisterScreen from "./pages/RegisterScreen";
 
 const Stack = createStackNavigator();
 
@@ -22,6 +24,8 @@ export default function App() {
       >
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="NextScreen" component={NextScreen} />
+        <Stack.Screen name="Login" component={LoginScreen}/>
+        <Stack.Screen name="Register" component={RegisterScreen}/>
         <Stack.Screen
           name="PharmacistHomeScreen"
           component={PharmacistHomeScreen}

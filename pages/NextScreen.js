@@ -9,8 +9,7 @@ import {
   ScrollView,
   Image
 } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+
 import * as ImagePicker from "expo-image-picker";
 //หน้าถัดไป
 export default function NextScreen() {
