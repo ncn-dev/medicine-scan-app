@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import axios from "axios";
 import {
   Button,
   StyleSheet,
@@ -12,15 +12,48 @@ import {
   ScrollView,
 } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
-import { Checkbox } from "react-native-paper";
+import { Checkbox } from "expo-checkbox";
 
 const logo = require("../assets/image/1.png");
 const logo4 = require("../assets/image/4.png");
 
+// formData.append("identityCardNumber", username)
+// formData.append("password", password)
+
 export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [isChecked, setChecked] = useState(false);
+
+
+  const fetchingData = async() => {
+    if(!username || !password) {
+      alert("Please input identityCardNumber or Password!");
+      return;
+    }
+    const formData = new FormData();
+    formData.append("identitynumber", username)
+    formData.append("password", password)
+    try {
+      const response = await axios.post(
+        "http://192.168.10.104:3000/api/login",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      if(response.data.status){
+        navigation.navigate("NextScreen")
+      }else{
+        alert('Please check your username or password')
+      }
+    } catch (err){
+      console.error("error uoloading image:", err);
+      alert("Connection Failed");
+    }
+  }
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "#FFFF" }}
@@ -75,7 +108,7 @@ export default function LoginScreen({ navigation }) {
                 marginVertical: 10,
                 backgroundColor: "#D9D9D9",
               }}
-              placeholder="Enter your username"
+              placeholder="Enter Identity Card Number"
               value={username}
               onChangeText={(text) => setUsername(text)}
             />
@@ -103,10 +136,10 @@ export default function LoginScreen({ navigation }) {
               }}
             >
               <Checkbox
-                status={rememberMe ? "checked" : "unchecked"}
-                onPress={() => setRememberMe(!rememberMe)}
-                color="#3498db" // สีเมื่อ checkbox ถูกเลือก
-                uncheckedColor="#D9D9D9" // สีเมื่อ checkbox ไม่ถูกเลือก
+                style={{ margin: 10 }}
+                value={isChecked}
+                onValueChange={setChecked}
+                color={isChecked ? "#18253B" : undefined}
               />
               <Text>Remember Me</Text>
             </View>
@@ -119,9 +152,7 @@ export default function LoginScreen({ navigation }) {
                 alignItems: "center",
                 marginTop: 5,
               }}
-              onPress={() =>
-                alert(`Welcome ,${username}! Remember Me:${rememberMe}`)
-              }
+              onPress={fetchingData}
             >
               <Text
                 style={{ color: "#FFFFFF", fontSize: 20, fontWeight: "bold" }}
@@ -131,7 +162,9 @@ export default function LoginScreen({ navigation }) {
             </TouchableOpacity>
             <View style={{ marginTop: 20, textAlign: "left", marginLeft: 40 }}>
               <View style={{ flexDirection: "row", alignItems: "center" }}>
-                <Text style={{ fontSize: 16 }}>Register Account, </Text>
+                <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+                  Register account,{" "}
+                </Text>
                 <TouchableOpacity
                   onPress={() => navigation.navigate("Register")}
                 >
@@ -142,9 +175,10 @@ export default function LoginScreen({ navigation }) {
                       fontWeight: "bold",
                       alignSelf: "flex-end",
                       textDecorationLine: "underline",
+                      paddingLeft: 3,
                     }}
                   >
-                    Click me
+                    click here
                   </Text>
                 </TouchableOpacity>
               </View>

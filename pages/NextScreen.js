@@ -17,6 +17,8 @@ export default function NextScreen() {
   const [imageUri, setImageUri] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
+
+
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -68,7 +70,7 @@ export default function NextScreen() {
         formData,
         {
           headers: {
-            "Content-Type": "multipart/from-data",
+            "Content-Type": "multipart/form-data",
           },
         }
       );
