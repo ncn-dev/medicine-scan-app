@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { Checkbox } from "expo-checkbox";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
 const logo = require("../assets/image/1.png");
 const logo4 = require("../assets/image/4.png");
@@ -25,15 +26,14 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [isChecked, setChecked] = useState(false);
 
-
-  const fetchingData = async() => {
-    if(!username || !password) {
+  const fetchingData = async () => {
+    if (!username || !password) {
       alert("Please input identityCardNumber or Password!");
       return;
     }
     const formData = new FormData();
-    formData.append("identitynumber", username)
-    formData.append("password", password)
+    formData.append("identitynumber", username);
+    formData.append("password", password);
     try {
       const response = await axios.post(
         "http://192.168.10.104:3000/api/login",
@@ -43,18 +43,18 @@ export default function LoginScreen({ navigation }) {
             "Content-Type": "multipart/form-data",
           },
         }
-      )
+      );
       console.log(response.data.status);
-      if(response.data.status){
-        navigation.navigate("NextScreen")
-      }else{
-        alert('Please check your username or password')
+      if (response.data.status) {
+        navigation.navigate("NextScreen");
+      } else {
+        alert("Please check your username or password");
       }
-    } catch (err){
+    } catch (err) {
       console.error("error uploading Formdata:", err);
       alert("Connection Failed");
     }
-  }
+  };
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "#FFFF" }}
@@ -62,10 +62,33 @@ export default function LoginScreen({ navigation }) {
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View style={{ flex: 1, backgroundColor: "#FFFF" }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              marginTop: 60,
+              marginLeft: 20,
+            }}
+          >
+            <TouchableOpacity
+              onPress={() => navigation.navigate("Home")}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 20,
+                backgroundColor: "#D9D9D9",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+             <Icon name="arrow-back" size={20} color="#000" />
+
+            </TouchableOpacity>
+          </View>
           <View>
             <Text
               style={{
-                marginTop: 100,
+                marginTop: "auto",
                 textAlign: "right",
                 fontSize: 40,
                 marginRight: 70,
