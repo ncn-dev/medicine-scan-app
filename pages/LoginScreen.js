@@ -44,13 +44,14 @@ export default function LoginScreen({ navigation }) {
           },
         }
       )
+      console.log(response.data.status);
       if(response.data.status){
         navigation.navigate("NextScreen")
       }else{
         alert('Please check your username or password')
       }
     } catch (err){
-      console.error("error uoloading image:", err);
+      console.error("error uploading Formdata:", err);
       alert("Connection Failed");
     }
   }
