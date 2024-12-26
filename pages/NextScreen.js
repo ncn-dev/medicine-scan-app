@@ -12,7 +12,7 @@ import {
 
 import * as ImagePicker from "expo-image-picker";
 //หน้าถัดไป
-export default function NextScreen() {
+export default function NextScreen({ navigation }) {
   const [data, setData] = useState("");
   const [imageUri, setImageUri] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -114,7 +114,7 @@ export default function NextScreen() {
             justifyContent: "center",
             alignItems: "center",
             
-            backgroundColor: "#DCDCDC",
+            backgroundColor: "#428CA3",
             marginTop: 50,
             paddingLeft:10,
             paddingRight:10
@@ -133,7 +133,7 @@ export default function NextScreen() {
             alignItems: "center",
             backgroundColor: "#F5F5F5",
             paddingBottom: 40,
-            marginTop:10
+            marginTop:50
           }}
         >
           <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>
@@ -176,7 +176,10 @@ export default function NextScreen() {
           )}
           {/*๊Upload Buttom */}
           <TouchableOpacity
-            onPress={uploadImage}
+            onPress={async() => {
+              await uploadImage();
+              navigation.navigate("InformationScreen", { uploadedData: data})
+            }}
             style={{
               backgroundColor: "#FF0000",
               paddingVertical: 15,

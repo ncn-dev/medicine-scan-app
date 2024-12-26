@@ -10,6 +10,7 @@ import NextScreen from "./pages/NextScreen";
 import PharmacistHomeScreen from "./pages/Pharamacist";
 import LoginScreen from "./pages/LoginScreen";
 import RegisterScreen from "./pages/RegisterScreen";
+import InformationSceen from "./pages/InformationScreen";
 
 const Stack = createStackNavigator();
 
@@ -27,9 +28,27 @@ export default function App() {
           component={HomeScreen}
           options={{ gestureEnabled: false }}
         />
-        <Stack.Screen name="NextScreen" component={NextScreen} />
-        <Stack.Screen name="Login" component={LoginScreen} />
-        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen 
+          name="NextScreen" 
+          component={NextScreen} 
+          options={{gestureEnabled: false}}
+          />
+        <Stack.Screen 
+          name="Login" 
+          component={LoginScreen}
+          options={{gestureEnabled: false}}
+           
+        />
+        <Stack.Screen 
+          name="Register" 
+          component={RegisterScreen}
+          options={{gestureEnabled: false}} 
+          />
+        <Stack.Screen
+          name="InformationScreen"
+          component={InformationSceen}
+          
+        />
         <Stack.Screen
           name="PharmacistHomeScreen"
           component={PharmacistHomeScreen}
