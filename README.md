@@ -1,4 +1,4 @@
-# MEDICINE-SCAN-APP
+# MEDICINE-SCAN-APP 📱💊
 
 ## Description
 This mobile application leverages the Google Vision API's OCR technology to scan and extract detailed drug information from medication labels. 🤖📱 It includes a custom-trained Language Learning Model (LLM) designed for pharmaceutical-specific 
