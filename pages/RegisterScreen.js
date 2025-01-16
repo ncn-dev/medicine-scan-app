@@ -11,9 +11,10 @@ import {
   Image,
 } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
-import Checkbox from 'expo-checkbox';
+import Checkbox from "expo-checkbox";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from "axios";
-
 
 const logo = require("../assets/image/1.png");
 
@@ -21,42 +22,60 @@ export default function RegisterScreen({ navigation }) {
   const [cardid, setCardid] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setshowDatePicker] = useState(false);
   const [isChecked, setChecked] = useState(false);
+  const [isPasswordVisible,setIsPasswordVisible] = useState(false);
 
-  const fetchingData = async() =>{
-    if(!cardid || !password || !name || !date ){
+  const onDataChange = (event, selectedDate) => {
+    setshowDatePicker(false);
+    if (selectedDate) {
+      setDate(selectedDate);
+    }else{
+      alert("please select a valid date");
+    }
+  };
+
+  const fetchingData = async () => {
+    if (!cardid || !password || !name || !date) {
       alert("Please input information");
       return;
     }
+    
+    const formattedDate = date instanceof Date ? date.toISOString().split('T')[0] : ""; // format date to YYYY-MM-DD
+    
+    if (!formattedDate){
+      alert("Invalid date");
+      return;
+    }
+
     const formData = new FormData();
-    formData.append("identitynumber", cardid)
-    formData.append("password", password)
-    formData.append("fullname", name)
-    formData.append("dateofbirth", date)
+    formData.append("identitynumber", cardid);
+    formData.append("password", password);
+    formData.append("fullname", name);
+    formData.append("dateofbirth", formattedDate);
     console.log(formData);
-    try{
+    try {
       const response = await axios.post(
         "http://192.168.10.104:3000/api/register",
         formData,
         {
-          headers:{
-            "Content-Type":"multipart/form-data",
-          }
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         }
-      )
+      );
       console.log(response.data.status);
-      if(response.data.status){
-        navigation.navigate("NextScreen")
-      }else{
-        alert("Register Failed / Please input agin!!!")
+      if (response.data.status) {
+        navigation.navigate("Homepage",{userName:name});
+        console.log(error);
+      } else {
+        alert("Register Failed / Please input agin!!!");
       }
-      
-    }catch(error){
+    } catch (error) {
       console.error(error);
       alert("Register Failed");
     }
-    
   };
 
   return (
@@ -142,8 +161,25 @@ export default function RegisterScreen({ navigation }) {
               }}
               placeholder="Ex.******"
               value={password}
+              secureTextEntry={!isPasswordVisible}
               onChangeText={(text) => setPassword(text)}
             />
+            <TouchableOpacity
+              style={{
+                position:"absolute",
+                right:70,
+                top:"39%",
+                transform: [{ translateY: -10 }],
+              }}
+              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+            >
+            <Icon
+              name={isPasswordVisible ? "eye" : "eye-slash"}
+              size={25}
+              color="#666"
+            />
+
+            </TouchableOpacity>
             <Text
               style={{
                 fontWeight: "bold",
@@ -176,7 +212,7 @@ export default function RegisterScreen({ navigation }) {
             >
               Date of Birth
             </Text>
-            <TextInput
+            <TouchableOpacity
               style={{
                 height: 50,
                 borderColor: "#D9D9D9",
@@ -185,11 +221,22 @@ export default function RegisterScreen({ navigation }) {
                 paddingHorizontal: 10,
                 marginVertical: 10,
                 backgroundColor: "#D9D9D9",
+                justifyContent: "center", // เพิ่มบรรทัดนี้เพื่อจัดตำแหน่งให้ข้อความอยู่ล่างสุด
+                alignItems: "flex-start",
               }}
-              placeholder="Ex.14/10/2003"
-              value={date}
-              onChangeText={(text) => setDate(text)}
-            />
+              onPress={() => setshowDatePicker(true)}
+            >
+              <Text style={{}}>{date.toLocaleDateString('en-GB')}</Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display="default"
+                onChange={onDataChange}
+                maximumDate={new Date()}
+              />
+            )}
           </View>
           <View
             style={{
@@ -200,10 +247,10 @@ export default function RegisterScreen({ navigation }) {
             }}
           >
             <Checkbox
-              style={{margin : 10}}
+              style={{ margin: 10 }}
               value={isChecked}
               onValueChange={setChecked}
-              color={isChecked ? '#18253B' : undefined}
+              color={isChecked ? "#18253B" : undefined}
             />
             <Text style={{ fontWeight: "bold" }}>Remember me</Text>
           </View>
@@ -220,7 +267,7 @@ export default function RegisterScreen({ navigation }) {
                 width: 290,
               }}
               onPress={fetchingData}
-              >
+            >
               <Text
                 style={{
                   color: "#FFFFFF",
@@ -238,7 +285,7 @@ export default function RegisterScreen({ navigation }) {
               <Text
                 style={{ fontSize: 15, fontWeight: "bold", marginLeft: 40 }}
               >
-                Already have account, 
+                Already have account,
               </Text>
               <TouchableOpacity onPress={() => navigation.navigate("Login")}>
                 <Text

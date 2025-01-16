@@ -13,7 +13,8 @@ import {
 } from "react-native";
 import { TextInput } from "react-native-gesture-handler";
 import { Checkbox } from "expo-checkbox";
-import Icon from "react-native-vector-icons/MaterialIcons";
+//import Icon from "react-native-vector-icons/MaterialIcons";
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const logo = require("../assets/image/1.png");
 const logo4 = require("../assets/image/4.png");
@@ -25,6 +26,7 @@ export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isChecked, setChecked] = useState(false);
+  const [isPasswordVisible,setIsPasswordVisible] = useState(false);
 
   const fetchingData = async () => {
     if (!username || !password) {
@@ -148,9 +150,24 @@ export default function LoginScreen({ navigation }) {
               }}
               placeholder="Enter your password"
               value={password}
-              secureTextEntry={true}
+              secureTextEntry={!isPasswordVisible}
               onChangeText={(text) => setPassword(text)}
             />
+            <TouchableOpacity
+              style={{
+                position:"absolute",
+                right:70,
+                top:"33%",
+                transform: [{ translateY: -10 }], 
+              }}
+              onPress={() => setIsPasswordVisible(!isPasswordVisible)}
+            >
+            <Icon
+              name={isPasswordVisible ? "eye" : "eye-slash"}
+              size={25}
+              color="#666"
+            />
+            </TouchableOpacity>
             {/*Checkbox*/}
             <View
               style={{

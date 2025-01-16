@@ -11,6 +11,7 @@ import PharmacistHomeScreen from "./pages/Pharamacist";
 import LoginScreen from "./pages/LoginScreen";
 import RegisterScreen from "./pages/RegisterScreen";
 import InformationSceen from "./pages/InformationScreen";
+import Homepage from "./pages/Homepage";
 
 const Stack = createStackNavigator();
 
@@ -43,7 +44,12 @@ export default function App() {
           name="Register" 
           component={RegisterScreen}
           options={{gestureEnabled: false}} 
-          />
+        />
+        <Stack.Screen
+          name="Homepage"
+          component={Homepage}
+          options={{gestureEnabled:false}}
+        />
         <Stack.Screen
           name="InformationScreen"
           component={InformationSceen}
