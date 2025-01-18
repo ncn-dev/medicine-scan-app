@@ -13,8 +13,14 @@ import { FlatList, TextInput } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
 export default function Homepage({ route, navigation }) {
-  const { userName } = route.params;
+  //const { userName } = route.params || { userName: userName};
   const [seach, setseach] = useState("");
+  const [userName, setUserName] = useState(route.params?.userName || "Guest");
+  useEffect(() => {
+    if (route.params?.userName && userName === "Guest") {
+      setUserName(route.params.userName); // ตั้งค่า userName ที่ส่งมาจาก route.params
+    }
+  }, [route.params?.userName]); // ใช้เมื่อ route.params เปลี่ยนแปลง
 
   const images = [
     { id: 1, uri: require("../assets/image/krung.jpg"), title: "Drug 1" },
@@ -22,6 +28,15 @@ export default function Homepage({ route, navigation }) {
       id: 2,
       uri: require("../assets/image/medicine.jpg"),
       title: "Medicine 2",
+    },
+  ];
+
+  const images1 = [
+    { id: 1, uri: require("../assets/image/drugs.jpg"), title: "drugs 2" },
+    {
+      id: 2,
+      uri: require("../assets/image/1.jpg"),
+      title: "drugs 3",
     },
   ];
 
@@ -221,16 +236,67 @@ export default function Homepage({ route, navigation }) {
           </Text>
         </View>
       </View>
-      <Text
-        style={{
-          marginTop: 25,
-          fontSize: 19,
-          fontWeight: "bold",
-          marginLeft: 15,
-        }}
-      >
-        Go to my Medicine Bag,....
-      </Text>
+      <View style={{ marginTop: 5, textAlign: "left", marginLeft: 10 }}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <Text
+            style={{
+              marginTop: 20,
+              fontSize: 15,
+              fontWeight: "bold",
+              marginLeft: 15,
+            }}
+          >
+            Go to my Medicine Bag,
+          </Text>
+          <TouchableOpacity onPress={() => navigation.navigate("MedBag")}>
+            <Text
+              style={{
+                marginTop: 20,
+                paddingLeft: 3,
+                color: "#428CA3",
+                fontSize: 15,
+                fontWeight: "bold",
+                alignSelf: "flex-end",
+                textDecorationLine: "underline",
+              }}
+            >
+              click here
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={{ marginTop: -60 }}>
+        <FlatList
+          data={images1}
+          keyExtractor={(item) => item.id.toString()}
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <View
+              style={{
+                margin: 11,
+                backgroundColor: "#f4f4f4",
+                borderRadius: 21,
+                overflow: "hidden",
+                alignItems: "center",
+                width: imageSize,
+              }}
+            >
+              <Image
+                source={item.uri}
+                style={{ width: "100%", height: 170, borderRadius: 21 }}
+                resizeMode="cover"
+              />
+            </View>
+          )}
+          contentContainerStyle={{ paddingTop: 70 }}
+          snapToInterval={imageSize + 30} // เพิ่มขนาดของ margin เพื่อให้ภาพแต่ละภาพพอดีกับหน้าจอ
+          decelerationRate="fast" // ให้การเลื่อนทำได้เร็วและราบรื่น
+          pagingEnabled={true} // การเลื่อนแต่ละหน้าจะล็อคที่ตำแหน่ง
+        />
+      </View>
+
       <View
         style={{
           flexDirection: "row",
@@ -331,7 +397,7 @@ export default function Homepage({ route, navigation }) {
         }}
       >
         <TouchableOpacity
-          onPress={() => navigation.navigate("Homepage")} // ใส่โค้ด onPress ให้ในตำแหน่งที่ถูกต้อง
+          onPress={() => navigation.navigate("NextScreen")} // ใส่โค้ด onPress ให้ในตำแหน่งที่ถูกต้อง
           style={{
             justifyContent: "center",
             alignItems: "center",

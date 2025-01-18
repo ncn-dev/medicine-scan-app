@@ -46,9 +46,14 @@ export default function LoginScreen({ navigation }) {
           },
         }
       );
+      console.log(response.data);
       console.log(response.data.status);
+      console.log(response.data.fullname);
+
       if (response.data.status) {
-        navigation.navigate("NextScreen");
+        const fullname = response.data.fullname;
+        alert(`Welcome ${response.data.fullname}`);
+        navigation.navigate("Homepage",{userName:fullname});
       } else {
         alert("Please check your username or password");
       }
@@ -63,30 +68,8 @@ export default function LoginScreen({ navigation }) {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ flex: 1, backgroundColor: "#FFFF" }}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              marginTop: 60,
-              marginLeft: 20,
-            }}
-          >
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Home")}
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: "#D9D9D9",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-             <Icon name="arrow-back" size={20} color="#000" />
-
-            </TouchableOpacity>
-          </View>
+        <View style={{ flex: 1, backgroundColor: "#FFFF",marginTop:90 }}>
+          
           <View>
             <Text
               style={{

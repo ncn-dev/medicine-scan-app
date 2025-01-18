@@ -7,17 +7,16 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  Image
+  Image,
 } from "react-native";
 
 import * as ImagePicker from "expo-image-picker";
+import Icon from "react-native-vector-icons/MaterialIcons";
 //หน้าถัดไป
 export default function NextScreen({ navigation }) {
   const [data, setData] = useState("");
   const [imageUri, setImageUri] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
-
-
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -49,7 +48,6 @@ export default function NextScreen({ navigation }) {
       setImageUri(result.assets[0].uri);
     }
   };
-
 
   const uploadImage = async () => {
     if (!imageUri) {
@@ -100,29 +98,50 @@ export default function NextScreen({ navigation }) {
 
   return (
     <View>
-      <ScrollView contentContainerStyle={{
-        flexGrow:1,
-        justifyContent:"center",
-        alignItems:"center",
-        backgroundColor:"#F5F5F5",
-        paddingVertical:20
-      }}
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
+        
+          backgroundColor: "#F5F5F5",
+          paddingVertical: 20,
+        }}
       >
+        <View
+          style={{
+            flexDirection: "row",
+            justifyItems:"flex-start",
+            alignItems: "center",
+            marginTop: 60,
+            marginLeft: 20,
+          }}
+        >
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Homepage")}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: "#D9D9D9",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Icon name="arrow-back" size={20} color="#000" />
+          </TouchableOpacity>
+        </View>
         <View
           style={{
             //flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            
-            backgroundColor: "#428CA3",
+
+            backgroundColor: "#f4f4f4",
             marginTop: 50,
-            paddingLeft:10,
-            paddingRight:10
+            paddingLeft: 10,
+            paddingRight: 10,
           }}
         >
-          <Text style={{ fontSize: 24,  }}>
-            {data.message}
-          </Text>
+          <Text style={{ fontSize: 24 }}>{data.message}</Text>
         </View>
 
         {/*อัปโหลดรูป*/}
@@ -133,7 +152,7 @@ export default function NextScreen({ navigation }) {
             alignItems: "center",
             backgroundColor: "#F5F5F5",
             paddingBottom: 40,
-            marginTop:50
+            marginTop: 50,
           }}
         >
           <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>
@@ -154,18 +173,19 @@ export default function NextScreen({ navigation }) {
           </TouchableOpacity>
 
           <TouchableOpacity
-          onPress={openCamera}
-          style={{
-            backgroundColor: "#18253B",
-            paddingVertical: 15,
-            paddingHorizontal: 40,
-            borderRadius: 10,
-            alignItems: "center",
-            marginBottom: 20,
-          }}
+            onPress={openCamera}
+            style={{
+              backgroundColor: "#18253B",
+              paddingVertical: 15,
+              paddingHorizontal: 40,
+              borderRadius: 10,
+              alignItems: "center",
+              marginBottom: 20,
+            }}
           >
-            <Text style={{ color: "#FFFFFF", fontSize: 18 }}>Open OpenCamera</Text>
-
+            <Text style={{ color: "#FFFFFF", fontSize: 18 }}>
+              Open OpenCamera
+            </Text>
           </TouchableOpacity>
 
           {imageUri && (
@@ -176,9 +196,9 @@ export default function NextScreen({ navigation }) {
           )}
           {/*๊Upload Buttom */}
           <TouchableOpacity
-            onPress={async() => {
+            onPress={async () => {
               await uploadImage();
-              navigation.navigate("InformationScreen", { uploadedData: data})
+              navigation.navigate("InformationScreen", { uploadedData: data });
             }}
             style={{
               backgroundColor: "#FF0000",

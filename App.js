@@ -12,6 +12,7 @@ import LoginScreen from "./pages/LoginScreen";
 import RegisterScreen from "./pages/RegisterScreen";
 import InformationSceen from "./pages/InformationScreen";
 import Homepage from "./pages/Homepage";
+import MedBag from "./pages/Medbag";
 
 const Stack = createStackNavigator();
 
@@ -54,6 +55,11 @@ export default function App() {
           name="InformationScreen"
           component={InformationSceen}
           
+        />
+        <Stack.Screen
+          name="MedBag"
+          component={MedBag}
+          options={{gestureEnabled:false}}
         />
         <Stack.Screen
           name="PharmacistHomeScreen"
