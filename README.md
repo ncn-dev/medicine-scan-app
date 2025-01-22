@@ -26,5 +26,7 @@ Q&A, enabling users to get accurate and instant answers to their medication-rela
 - PostgreSQL
 
 ## Screenshots 📸
+### The startup screen of the application 🌟📱✨
+![Get Start](assets/image/getstart.jpg)
 ## Author ✍️
 - Deverlop by Natchanan and Nonpawit 

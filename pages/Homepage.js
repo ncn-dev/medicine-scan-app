@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   Dimensions,
+  ScrollView,
 } from "react-native";
 import { Image } from "react-native";
 import { FlatList, TextInput } from "react-native-gesture-handler";
@@ -43,7 +44,7 @@ export default function Homepage({ route, navigation }) {
   const imageSize = Dimensions.get("window").width * 0.8;
 
   return (
-    <View style={{ paddingHorizontal: 30, marginTop: 10 }}>
+    <View style={{ marginTop: 10 }}>
       <View
         style={{
           paddingTop: 70,
@@ -54,12 +55,13 @@ export default function Homepage({ route, navigation }) {
           style={{
             fontSize: 30,
             fontWeight: "bold",
+            paddingHorizontal: 30,
           }}
         >
           Hi, Khun{userName}!
         </Text>
       </View>
-      <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, paddingLeft: 40, paddingRight: 40 }}>
         <TextInput
           style={{
             height: 50,
@@ -79,235 +81,260 @@ export default function Homepage({ route, navigation }) {
             left: 10,
             top: 30,
             transform: [{ translateY: -10 }],
+            paddingLeft: 40,
           }}
           onPress={() => setseach()}
         >
           <Icon name="search" size={30} color="#666" />
         </TouchableOpacity>
       </View>
+    
+      <ScrollView
+        contentContainerStyle={{
+          flexGrow: 1,
 
-      <FlatList
-        data={images}
-        keyExtractor={(item) => item.id.toString()}
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <View
-            style={{
-              margin: 11,
-              backgroundColor: "#f4f4f4",
-              borderRadius: 21,
-              overflow: "hidden",
-              alignItems: "center",
-              width: imageSize,
-            }}
-          >
-            <Image
-              source={item.uri}
-              style={{ width: "100%", height: 170, borderRadius: 21 }}
-              resizeMode="cover"
-            />
-          </View>
-        )}
-        contentContainerStyle={{ paddingTop: 70 }}
-        snapToInterval={imageSize + 30} // เพิ่มขนาดของ margin เพื่อให้ภาพแต่ละภาพพอดีกับหน้าจอ
-        decelerationRate="fast" // ให้การเลื่อนทำได้เร็วและราบรื่น
-        pagingEnabled={true} // การเลื่อนแต่ละหน้าจะล็อคที่ตำแหน่ง
-      />
-
-      <View
-        style={{
-          flexDirection: "row", // จัดเรียงกล่องในแนวนอน
-          justifyContent: "flex-start", // จัดกล่องให้เริ่มต้นที่ซ้าย
-          alignItems: "center", // จัดกล่องให้อยู่กลางในแนวตั้ง
-          marginTop: 10, // ระยะห่างจากด้านบน
+          backgroundColor: "#F5F5F5",
+          paddingVertical: 20,
         }}
       >
         <View
           style={{
-            backgroundColor: "#DCDCDC", // สีพื้นหลังของ card
-            padding: 20,
-            borderRadius: 10,
-            alignItems: "center",
-            justifyContent: "center",
-            width: 150,
-            height: 150, // ขนาด card
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 4,
-            elevation: 4,
-            marginTop: 10,
-            marginLeft: 10,
+            paddingHorizontal: 30,
           }}
         >
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "700",
-              color: "#000",
-              marginBottom: 5,
-            }}
-          >
-            Glippizide
-          </Text>
+          <FlatList
+            data={images}
+            keyExtractor={(item) => item.id.toString()}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <View
+                style={{
+                  margin: 11,
+                  backgroundColor: "#f4f4f4",
+                  borderRadius: 21,
+                  overflow: "hidden",
+                  alignItems: "center",
+                  width: imageSize,
+                }}
+              >
+                <Image
+                  source={item.uri}
+                  style={{ width: "100%", height: 170, borderRadius: 21 }}
+                  resizeMode="cover"
+                />
+              </View>
+            )}
+            contentContainerStyle={{ paddingTop: 70 }}
+            snapToInterval={imageSize + 30} // เพิ่มขนาดของ margin เพื่อให้ภาพแต่ละภาพพอดีกับหน้าจอ
+            decelerationRate="fast" // ให้การเลื่อนทำได้เร็วและราบรื่น
+            pagingEnabled={true} // การเลื่อนแต่ละหน้าจะล็อคที่ตำแหน่ง
+          />
+        </View>
 
-          <Text
+        <View
+          style={{
+            flexDirection: "row", // จัดเรียงกล่องในแนวนอน
+            justifyContent: "flex-start", // จัดกล่องให้เริ่มต้นที่ซ้าย
+            alignItems: "center", // จัดกล่องให้อยู่กลางในแนวตั้ง
+            marginTop: 10,
+            paddingHorizontal: 30, // ระยะห่างจากด้านบน
+          }}
+        >
+          <View
             style={{
-              fontSize: 12,
-              color: "gray",
-              marginBottom: 20,
-            }}
-          >
-            Remaining Doses
-          </Text>
-          <Text
-            style={{
-              fontSize: 30,
-              fontWeight: "700",
-              color: "#000",
+              backgroundColor: "#DCDCDC", // สีพื้นหลังของ card
+              padding: 20,
+              borderRadius: 10,
+              alignItems: "center",
+              justifyContent: "center",
+              width: 150,
+              height: 150, // ขนาด card
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 4,
+              elevation: 4,
+              marginTop: 10,
+              marginLeft: 10,
             }}
           >
             <Text
               style={{
-                fontSize: 50, // ขนาดตัวเลข
-                fontWeight: "bold",
+                fontSize: 20,
+                fontWeight: "700",
+                color: "#000",
+                marginBottom: 5,
               }}
             >
-              13
+              Glippizide
             </Text>
-            day
-          </Text>
+
+            <Text
+              style={{
+                fontSize: 12,
+                color: "gray",
+                marginBottom: 20,
+              }}
+            >
+              Remaining Doses
+            </Text>
+            <Text
+              style={{
+                fontSize: 30,
+                fontWeight: "700",
+                color: "#000",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 50, // ขนาดตัวเลข
+                  fontWeight: "bold",
+                }}
+              >
+                13
+              </Text>
+              day
+            </Text>
+          </View>
+          <View
+            style={{
+              backgroundColor: "#DCDCDC", // สีพื้นหลังของ card
+              padding: 20,
+              borderRadius: 10,
+              alignItems: "center",
+              justifyContent: "center",
+              width: 150,
+              height: 150, // ขนาด card
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.2,
+              shadowRadius: 4,
+              elevation: 4,
+              marginTop: 10,
+              marginLeft: 10,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: "700",
+                color: "#000",
+                marginBottom: 5,
+              }}
+            >
+              Glippizide
+            </Text>
+
+            <Text
+              style={{
+                fontSize: 12,
+                color: "gray",
+                marginBottom: 20,
+              }}
+            >
+              Remaining Doses
+            </Text>
+            <Text
+              style={{
+                fontSize: 30,
+                fontWeight: "700",
+                color: "#000",
+              }}
+            >
+              <Text
+                style={{
+                  fontSize: 50, // ขนาดตัวเลข
+                  fontWeight: "bold",
+                }}
+              >
+                13
+              </Text>
+              day
+            </Text>
+          </View>
         </View>
         <View
           style={{
-            backgroundColor: "#DCDCDC", // สีพื้นหลังของ card
-            padding: 20,
-            borderRadius: 10,
-            alignItems: "center",
-            justifyContent: "center",
-            width: 150,
-            height: 150, // ขนาด card
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 4,
-            elevation: 4,
-            marginTop: 10,
+            marginTop: 5,
+            textAlign: "left",
             marginLeft: 10,
+            paddingHorizontal: 20,
           }}
         >
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "700",
-              color: "#000",
-              marginBottom: 5,
-            }}
-          >
-            Glippizide
-          </Text>
-
-          <Text
-            style={{
-              fontSize: 12,
-              color: "gray",
-              marginBottom: 20,
-            }}
-          >
-            Remaining Doses
-          </Text>
-          <Text
-            style={{
-              fontSize: 30,
-              fontWeight: "700",
-              color: "#000",
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 50, // ขนาดตัวเลข
-                fontWeight: "bold",
-              }}
-            >
-              13
-            </Text>
-            day
-          </Text>
-        </View>
-      </View>
-      <View style={{ marginTop: 5, textAlign: "left", marginLeft: 10 }}>
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <Text
-            style={{
-              marginTop: 20,
-              fontSize: 15,
-              fontWeight: "bold",
-              marginLeft: 15,
-            }}
-          >
-            Go to my Medicine Bag,
-          </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("MedBag")}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Text
               style={{
                 marginTop: 20,
-                paddingLeft: 3,
-                color: "#428CA3",
                 fontSize: 15,
                 fontWeight: "bold",
-                alignSelf: "flex-end",
-                textDecorationLine: "underline",
+                marginLeft: 15,
               }}
             >
-              click here
+              Go to my Medicine Bag,
             </Text>
-          </TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("MedBag")}>
+              <Text
+                style={{
+                  marginTop: 20,
+                  paddingLeft: 3,
+                  color: "#428CA3",
+                  fontSize: 15,
+                  fontWeight: "bold",
+                  alignSelf: "flex-end",
+                  textDecorationLine: "underline",
+                }}
+              >
+                click here
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </View>
 
-      <View style={{ marginTop: -60 }}>
-        <FlatList
-          data={images1}
-          keyExtractor={(item) => item.id.toString()}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <View
-              style={{
-                margin: 11,
-                backgroundColor: "#f4f4f4",
-                borderRadius: 21,
-                overflow: "hidden",
-                alignItems: "center",
-                width: imageSize,
-              }}
-            >
-              <Image
-                source={item.uri}
-                style={{ width: "100%", height: 170, borderRadius: 21 }}
-                resizeMode="cover"
-              />
-            </View>
-          )}
-          contentContainerStyle={{ paddingTop: 70 }}
-          snapToInterval={imageSize + 30} // เพิ่มขนาดของ margin เพื่อให้ภาพแต่ละภาพพอดีกับหน้าจอ
-          decelerationRate="fast" // ให้การเลื่อนทำได้เร็วและราบรื่น
-          pagingEnabled={true} // การเลื่อนแต่ละหน้าจะล็อคที่ตำแหน่ง
-        />
-      </View>
-
+        <View style={{ marginTop: -60, paddingHorizontal: 30 }}>
+          <FlatList
+            data={images1}
+            keyExtractor={(item) => item.id.toString()}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            renderItem={({ item }) => (
+              <View
+                style={{
+                  margin: 11,
+                  backgroundColor: "#f4f4f4",
+                  borderRadius: 21,
+                  overflow: "hidden",
+                  alignItems: "center",
+                  width: imageSize,
+                }}
+              >
+                <Image
+                  source={item.uri}
+                  style={{ width: "100%", height: 170, borderRadius: 21 }}
+                  resizeMode="cover"
+                />
+              </View>
+            )}
+            contentContainerStyle={{ paddingTop: 70 }}
+            snapToInterval={imageSize + 30} // เพิ่มขนาดของ margin เพื่อให้ภาพแต่ละภาพพอดีกับหน้าจอ
+            decelerationRate="fast" // ให้การเลื่อนทำได้เร็วและราบรื่น
+            pagingEnabled={true} // การเลื่อนแต่ละหน้าจะล็อคที่ตำแหน่ง
+          />
+        </View>
+      </ScrollView>
       <View
         style={{
-          flexDirection: "row",
-          justifyContent: "flex-start", // ชิดซ้าย
-          alignItems: "center",
-          backgroundColor: "#1E293B", // สีพื้นหลังของแถบ
-          position: "absolute",
-          bottom: -300, // ติดล่างหน้าจอ
-          height: 150, // ลดขนาดให้พอดีกับการแสดง
-          width: 500, // ขยายเต็มหน้าจอ
-          paddingHorizontal: 20, // เพิ่ม padding ซ้ายขวา
+          position: "fixed", // ติดกับขอบล่างของหน้าจอ
+          bottom: 0,
+          left: 0,
+          right: 0,
+          top: -50,
+          width: "100%",
+          height: 200, // ความสูง Navbar
+          flexDirection: "row", // จัดเรียงแนวนอน
+          justifyContent: "space-around", // กระจายไอคอนให้สมดุล
+          alignItems: "center", // จัดให้อยู่กึ่งกลางแนวตั้ง
+          backgroundColor: "#1E293B", // พื้นหลัง Navbar
         }}
       >
         <TouchableOpacity
@@ -315,7 +342,7 @@ export default function Homepage({ route, navigation }) {
           style={{
             flexDirection: "column", // หากต้องการเพิ่มไอคอนหรือข้อความข้างๆ
             alignItems: "center",
-            marginTop: -80,
+            marginTop: -130,
             marginLeft: 10,
           }}
         >
@@ -330,7 +357,7 @@ export default function Homepage({ route, navigation }) {
           style={{
             flexDirection: "column", // หากต้องการเพิ่มไอคอนหรือข้อความข้างๆ
             alignItems: "center",
-            marginTop: -80,
+            marginTop: -130,
             marginLeft: 20,
           }}
         >
@@ -343,8 +370,8 @@ export default function Homepage({ route, navigation }) {
         <Text
           style={{
             color: "#FFFFFF",
-            marginLeft: 24,
-            marginTop: -50,
+            marginLeft: 30,
+            marginTop: -100,
             fontSize: 19,
           }}
         >
@@ -356,7 +383,7 @@ export default function Homepage({ route, navigation }) {
           style={{
             flexDirection: "column", // หากต้องการเพิ่มไอคอนหรือข้อความข้างๆ
             alignItems: "center",
-            marginTop: -80,
+            marginTop: -130,
             marginLeft: 20,
           }}
         >
@@ -371,8 +398,9 @@ export default function Homepage({ route, navigation }) {
           style={{
             flexDirection: "column", // หากต้องการเพิ่มไอคอนหรือข้อความข้างๆ
             alignItems: "center",
-            marginTop: -80,
+            marginTop: -130,
             marginLeft: 20,
+            marginRight: 10,
           }}
         >
           <Icon name="settings" size={30} color="#FFFFFF" />
@@ -388,7 +416,7 @@ export default function Homepage({ route, navigation }) {
           alignItems: "center",
           backgroundColor: "#1E293B", // สีพื้นหลังของแถบ
           position: "absolute",
-          bottom: -190,
+          bottom: 210,
           borderRadius: 50, // ติดล่างหน้าจอ
           height: 70, // ลดขนาดให้พอดีกับการแสดง
           width: 70, // ขยายเต็มหน้าจอ
