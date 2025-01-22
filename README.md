@@ -27,6 +27,6 @@ Q&A, enabling users to get accurate and instant answers to their medication-rela
 
 ## Screenshots 📸
 ### The startup screen of the application 🌟📱✨
-<img src="assets/image/getstart.jpg" alt="App Screenshot" width="400"/>
+<img src="assets/image/getstart.jpg" alt="App Screenshot" width="200"/>
 ## Author ✍️
 - Deverlop by Natchanan and Nonpawit 
