@@ -28,5 +28,23 @@ Q&A, enabling users to get accurate and instant answers to their medication-rela
 ## Screenshots 📸
 ### The startup screen of the application 🌟📱✨
 <img src="assets/image/getstart.jpg" alt="App Screenshot" width="200"/>
+
+### The login screen 🔐💻
+<img src="assets/image/login.jpg" alt="App Screenshot" width="200"/>
+
+### The register screen 📝🎉
+<img src="assets/image/register.jpg" alt="App Screenshot" width="200"/>
+
+### The homepage 🏠✨
+<img src="assets/image/Home page.jpg" alt="App Screenshot" width="200"/>
+
+### The screen for selecting an image or opening the camera to call the OCR API and extract text 📸📝🔍
+<img src="assets/image/selectimage.jpg" alt="App Screenshot" width="200"/>
+
+### The screen displaying the text extracted from the image by OCR 📜🔠
+<img src="assets/image/ocrresult.jpg" alt="App Screenshot" width="200"/>
+
+
+
 ## Author ✍️
 - Deverlop by Natchanan and Nonpawit 
