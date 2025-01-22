@@ -44,7 +44,16 @@ export default function Homepage({ route, navigation }) {
   const imageSize = Dimensions.get("window").width * 0.8;
 
   return (
-    <View style={{ marginTop: 10 }}>
+    <View style={{ marginTop: 10 , backgroundColor:"#FFFFFF"}}>
+      <View
+        style={{
+          position: "absolute",
+          zIndex: 10, 
+          backgroundColor:"#FFFFFF",
+          width:"100%",
+          marginTop:-10
+        }}
+      >
       <View
         style={{
           paddingTop: 70,
@@ -88,18 +97,20 @@ export default function Homepage({ route, navigation }) {
           <Icon name="search" size={30} color="#666" />
         </TouchableOpacity>
       </View>
-    
+      </View>
+
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
 
-          backgroundColor: "#F5F5F5",
+          backgroundColor:"#FFFFFF",
           paddingVertical: 20,
         }}
       >
         <View
           style={{
             paddingHorizontal: 30,
+            marginTop:80
           }}
         >
           <FlatList
@@ -353,7 +364,7 @@ export default function Homepage({ route, navigation }) {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate("Homepage")} // ใส่โค้ด onPress ให้ในตำแหน่งที่ถูกต้อง
+          onPress={() => navigation.navigate("MedBag")} // ใส่โค้ด onPress ให้ในตำแหน่งที่ถูกต้อง
           style={{
             flexDirection: "column", // หากต้องการเพิ่มไอคอนหรือข้อความข้างๆ
             alignItems: "center",

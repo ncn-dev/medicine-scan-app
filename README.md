@@ -31,7 +31,7 @@ Q&A, enabling users to get accurate and instant answers to their medication-rela
 <br>
 
 ### The login screen 🔐💻
-<img src="assets/image/login.jpg" alt="App Screenshot" width="200"/>
+<img src="assets/image/draf3.jpg" alt="App Screenshot" width="200"/>
 <br> 
 
 ### The register screen 📝🎉
@@ -39,7 +39,7 @@ Q&A, enabling users to get accurate and instant answers to their medication-rela
 <br>
 
 ### The homepage 🏠✨
-<img src="assets/image/Home page.jpg" alt="App Screenshot" width="200"/>
+<img src="assets/image/draf2.jpg" alt="App Screenshot" width="200"/>
 <br>
 
 ### The screen for selecting an image or opening the camera to call the OCR API and extract text 📸📝🔍
