@@ -405,7 +405,7 @@ export default function Homepage({ route, navigation }) {
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate("Homepage")} // ใส่โค้ด onPress ให้ในตำแหน่งที่ถูกต้อง
+          onPress={() => navigation.navigate("SettingPage")} // ใส่โค้ด onPress ให้ในตำแหน่งที่ถูกต้อง
           style={{
             flexDirection: "column", // หากต้องการเพิ่มไอคอนหรือข้อความข้างๆ
             alignItems: "center",

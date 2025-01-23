@@ -13,6 +13,7 @@ import RegisterScreen from "./pages/RegisterScreen";
 import InformationSceen from "./pages/InformationScreen";
 import Homepage from "./pages/Homepage";
 import MedBag from "./pages/Medbag";
+import SettingPage from "./pages/Settingpage";
 
 const Stack = createStackNavigator();
 
@@ -54,6 +55,11 @@ export default function App() {
         <Stack.Screen
           name="InformationScreen"
           component={InformationSceen}
+          
+        />
+         <Stack.Screen
+          name="SettingPage"
+          component={SettingPage}
           
         />
         <Stack.Screen
