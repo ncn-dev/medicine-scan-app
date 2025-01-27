@@ -12,8 +12,15 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true
+   "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"],
+        "NSUserTrackingUsageDescription": "This app uses notifications for user alerts.",
+        "UIUserNotificationSettings": {
+          "NSPushNotifications": true
+        }
+      }
     },
     "android": {
       "adaptiveIcon": {

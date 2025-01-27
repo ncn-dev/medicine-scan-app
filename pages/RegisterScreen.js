@@ -19,7 +19,7 @@ import axios from "axios";
 const logo = require("../assets/image/1.png");
 
 export default function RegisterScreen({ navigation }) {
-  const [cardid, setCardid] = useState("");
+  const [idcard, setIdcard] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [date, setDate] = useState(new Date());
@@ -37,7 +37,7 @@ export default function RegisterScreen({ navigation }) {
   };
 
   const fetchingData = async () => {
-    if (!cardid || !password || !name || !date) {
+    if (!idcard || !password || !name || !date) {
       alert("Please input information");
       return;
     }
@@ -48,33 +48,31 @@ export default function RegisterScreen({ navigation }) {
       alert("Invalid date");
       return;
     }
-
-    const formData = new FormData();
-    formData.append("identitynumber", cardid);
-    formData.append("password", password);
-    formData.append("fullname", name);
-    formData.append("dateofbirth", formattedDate);
-    console.log(formData);
+    const data = {
+      "idcard": idcard,
+      "password": password,
+      "fullname": name,
+      "dateofbirth": formattedDate
+    }
+    // const formData = new FormData();
+    // formData.append("idcard", idcard);
+    // formData.append("password", password);
+    // formData.append("fullname", name);
+    // formData.append("dateofbirth", formattedDate);
+    // console.log(formData);
     try {
       const response = await axios.post(
-        "http://192.168.10.104:3000/api/register",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        "http://192.168.10.104:3000/api/auth/register",
+        data,
       );
-      console.log(response.data.status);
-      if (response.data.status) {
-        navigation.navigate("Homepage",{userName:name});
-        console.log(error);
+      if (!response.ok) {
+        navigation.navigate("Homepage", { username: idcard });
       } else {
-        alert("Register Failed / Please input agin!!!");
+        alert("Register Failed, Please Trying Again.");
       }
-    } catch (error) {
-      console.error(error);
-      alert("Register Failed");
+    } catch (err) {
+      console.error(err);
+      alert("Register Failed, Please Trying Again.");
     }
   };
 
@@ -137,8 +135,8 @@ export default function RegisterScreen({ navigation }) {
                 backgroundColor: "#D9D9D9",
               }}
               placeholder="Ex.12-3-4567-89123-4"
-              value={cardid}
-              onChangeText={(text) => setCardid(text)}
+              value={idcard}
+              onChangeText={(text) => setIdcard(text)}
             />
             <Text
               style={{
@@ -308,3 +306,4 @@ export default function RegisterScreen({ navigation }) {
     </KeyboardAvoidingView>
   );
 }
+``

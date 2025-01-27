@@ -1,10 +1,6 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Button, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Image } from "react-native";
-
 import HomeScreen from "./pages/Home";
 import NextScreen from "./pages/NextScreen";
 import PharmacistHomeScreen from "./pages/Pharamacist";
@@ -14,18 +10,20 @@ import InformationSceen from "./pages/InformationScreen";
 import Homepage from "./pages/Homepage";
 import MedBag from "./pages/Medbag";
 import SettingPage from "./pages/Settingpage";
+import Notification from "./pages/Notification";
+import Detail from "./pages/Detail";
 
 const Stack = createStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator
-        initialRouteName="Home"
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
+        <Stack.Navigator
+          initialRouteName="MedBag"
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
         <Stack.Screen
           name="Home"
           component={HomeScreen}
@@ -65,11 +63,21 @@ export default function App() {
         <Stack.Screen
           name="MedBag"
           component={MedBag}
-          options={{gestureEnabled:false}}
+          options={{gestureEnabled:true}}
+        />
+         <Stack.Screen
+          name="Notification"
+          component={Notification}
+          options={{gestureEnabled:true}}
         />
         <Stack.Screen
           name="PharmacistHomeScreen"
           component={PharmacistHomeScreen}
+        />
+         <Stack.Screen
+          name="Detail"
+          component={Detail}
+          options={{gestureEnabled:true}}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -14,7 +14,7 @@ import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/MaterialIcons";
 //หน้าถัดไป
 export default function NextScreen({ navigation }) {
-  const [data, setData] = useState("");
+  const [data, setData] = useState({});
   const [imageUri, setImageUri] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -33,22 +33,31 @@ export default function NextScreen({ navigation }) {
       setImageUri(result.assets[0].uri);
     }
   };
-  const openCamera = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== "granted") {
-      alert("Permission to access me dia library is required");
-      return;
-    }
-    const result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-    });
-    if (!result.canceled) {
-      setImageUri(result.assets[0].uri);
-    }
-  };
+  useEffect(() => {
+    const openCamera = async () => {
+      try{
+        const { status } = await ImagePicker.requestCameraPermissionsAsync();
+        if (status !== "granted") {
+          alert("Permission to access me dia library is required");
+          return;
+        }
+        
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+      });
+      if (!result.canceled) {
+        setImageUri(result.assets[0].uri);
+      }
+      }catch(error){
+        
+      }
+     
 
+    };
+    openCamera();
+  },[]);
   const uploadImage = async () => {
     if (!imageUri) {
       alert("Please select an image first.");
@@ -64,7 +73,7 @@ export default function NextScreen({ navigation }) {
 
     try {
       const response = await axios.post(
-        "http://192.168.10.104:3000/api/upload",
+        "http://192.168.10.104:3000/api/images/uploads",
         formData,
         {
           headers: {
@@ -72,9 +81,9 @@ export default function NextScreen({ navigation }) {
           },
         }
       );
-      alert("Image uploaded successfully.");
-      console.log(response.data.message);
-      setData(response.data);
+      //alert("Image uploaded successfully.");
+      navigation.navigate("InformationScreen", { uploadedData: response.data });
+
     } catch (error) {
       console.error("error uoloading image:", error);
       alert("Failed to uplad image or fetch OCR data");
@@ -171,23 +180,6 @@ export default function NextScreen({ navigation }) {
           >
             <Text style={{ color: "#FFFFFF", fontSize: 18 }}>Choose Image</Text>
           </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={openCamera}
-            style={{
-              backgroundColor: "#18253B",
-              paddingVertical: 15,
-              paddingHorizontal: 40,
-              borderRadius: 10,
-              alignItems: "center",
-              marginBottom: 20,
-            }}
-          >
-            <Text style={{ color: "#FFFFFF", fontSize: 18 }}>
-              Open OpenCamera
-            </Text>
-          </TouchableOpacity>
-
           {imageUri && (
             <Image
               source={{ uri: imageUri }}
@@ -196,10 +188,7 @@ export default function NextScreen({ navigation }) {
           )}
           {/*๊Upload Buttom */}
           <TouchableOpacity
-            onPress={async () => {
-              await uploadImage();
-              navigation.navigate("InformationScreen", { uploadedData: data });
-            }}
+            onPress={uploadImage}
             style={{
               backgroundColor: "#FF0000",
               paddingVertical: 15,

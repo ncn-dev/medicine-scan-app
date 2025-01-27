@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   StyleSheet,
@@ -15,31 +15,24 @@ import Checkbox from "expo-checkbox";
 import axios from "axios";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
-export default function InformationSceen({ route,navigation }) {
-  const { uploadedData } = route.params;
+export default function InformationSceen({ route, navigation }) {
+  const { uploadedData } = route.params || {};
   const [data, setData] = useState(uploadedData);
 
-  // เช็คการเปลี่ยนแปลงของ uploadedData
   useEffect(() => {
-    if (uploadedData) {
-      setData(uploadedData);
-    }
-  }, [uploadedData]);  // เช็คเมื่อ uploadedData เปลี่ยน
-
-  if (!data || !data.message) {
-    return <Text>Data is missing</Text>;
-  }
+    console.log(uploadedData);
+  }, []);
 
   return (
     <View>
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <View
           style={{
-            flex:1
+            flex: 1,
           }}
         >
           <TouchableOpacity
-            onPress={() => navigation.navigate("NextScreen")}
+            onPress={() => navigation.navigate("Homepage")}
             style={{
               width: 40,
               height: 40,
@@ -47,8 +40,8 @@ export default function InformationSceen({ route,navigation }) {
               //backgroundColor: "#D9D9D9",
               alignItems: "center",
               justifyContent: "center",
-              marginTop:50,
-              marginRight:300
+              marginTop: 50,
+              marginRight: 300,
             }}
           >
             <Icon name="arrow-back" size={20} color="#000" />
@@ -58,11 +51,19 @@ export default function InformationSceen({ route,navigation }) {
           style={{
             justifyContent: "center",
             alignItems: "center",
-            marginLeft:20,
+            marginLeft: 20,
             marginTop: 20,
           }}
         >
-          <Text style={{ fontSize: 24 }}>{data.message}</Text>
+          <View>
+            {Object.entries(data).map(([key, value]) => (
+              <View key={key} style={{ marginBottom: 10 }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold" }}>{key}:</Text>
+                <Text style={{ fontSize: 16 }}>{value}</Text>
+              </View>
+            ))}
+          </View>
+          {/* <Text style={{ fontSize: 24 }}>{data.Dosage}</Text> */}
         </View>
       </ScrollView>
     </View>

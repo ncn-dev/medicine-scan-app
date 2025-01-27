@@ -30,36 +30,30 @@ export default function LoginScreen({ navigation }) {
 
   const fetchingData = async () => {
     if (!username || !password) {
-      alert("Please input identityCardNumber or Password!");
+      alert("Please input identityCardNumber and Password!");
       return;
     }
-    const formData = new FormData();
-    formData.append("identitynumber", username);
-    formData.append("password", password);
+    const data = {
+      "idcard" : username, 
+      "password" : password
+    }
+    // const formData = new FormData();
+    // formData.append("idcard", username);
+    // formData.append("password", password);
     try {
       const response = await axios.post(
-        "http://192.168.10.104:3000/api/login",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
+        "http://192.168.10.104:3000/api/auth/login",
+        data,
       );
-      console.log(response.data);
-      console.log(response.data.status);
-      console.log(response.data.fullname);
-
-      if (response.data.status) {
-        const fullname = response.data.fullname;
-        alert(`Welcome ${response.data.fullname}`);
-        navigation.navigate("Homepage",{userName:fullname});
+      console.log(response.data)
+      if (!response.ok) {
+        navigation.navigate("Homepage", {username : username});
       } else {
-        alert("Please check your username or password");
+        alert("Login Failed, Please Trying Again.");
       }
     } catch (err) {
-      console.error("error uploading Formdata:", err);
-      alert("Connection Failed");
+      console.error(err);
+      alert("Login Failed, Please Trying Again.");
     }
   };
   return (

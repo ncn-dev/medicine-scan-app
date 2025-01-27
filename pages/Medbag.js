@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,13 +10,25 @@ import {
 import Icon from "react-native-vector-icons/MaterialIcons";
 
 export default function MedBag({ navigation }) {
-  const [data, setData] = useState([
-    { id: "1", name: "John Doe", date: "2025-01-01" },
-    { id: "2", name: "Jane Smith", date: "2025-01-05" },
-  ]);
+  const [data, setData] = useState([]);
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        "http://192.168.10.104:3000/api/user/medbag/admin"
+      );
+      await setData(response.data);
+      console.log(data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-  const Card = ({ name, date }) => (
-    <View
+  const Card = ({ name, dose, date ,item,}) => (
+    <TouchableOpacity
+      onPress={() => navigation.navigate("Detail",{ item : item })}
       style={{
         height: 170, // ความสูงการ์ดรวม
         borderRadius: 10,
@@ -46,12 +59,29 @@ export default function MedBag({ navigation }) {
           alignItems: "flex-start",
         }}
       >
-        <Text style={{ fontSize: 14, fontWeight: "bold", color: "#333" ,marginLeft:40,marginTop:-40}}>
+        <Text
+          style={{
+            fontSize: 14,
+            fontWeight: "bold",
+            color: "#333",
+            marginLeft: 40,
+            marginTop: -10,
+          }}
+        >
           {name}
         </Text>
-        <Text style={{ fontSize: 14, color: "#555" ,marginLeft:40,marginTop:1}}>{date}</Text>
+        <Text
+          style={{ fontSize: 14, color: "#555", marginLeft: 40, marginTop: 1 }}
+        >
+          {dose}
+        </Text>
+        <Text
+          style={{ fontSize: 14, color: "#555", marginLeft: 40, marginTop: 1 }}
+        >
+          {date}
+        </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -100,7 +130,13 @@ export default function MedBag({ navigation }) {
       <FlatList
         data={data}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <Card name={item.name} date={item.date} />}
+        renderItem={({ item }) => (
+          <Card
+            name={`Drug name : ${item.medicinename}`}
+            dose={`Dosage : ${item.dose}`}
+            date={`MFG : ${item.mfg}, EXP : ${item.exp}`}
+          />
+        )}
         contentContainerStyle={{ paddingBottom: 10 }}
       />
     </View>

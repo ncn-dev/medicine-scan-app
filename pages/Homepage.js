@@ -9,19 +9,15 @@ import {
   ScrollView,
 } from "react-native";
 import { Image } from "react-native";
+import axios from "axios";
 import { FlatList, TextInput } from "react-native-gesture-handler";
 //import { Item } from "react-native-paper/lib/typescript/components/Drawer/Drawer";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
 export default function Homepage({ route, navigation }) {
-  //const { userName } = route.params || { userName: userName};
+  const [fullname, setFullname] = useState("Nonpawit");
   const [seach, setseach] = useState("");
-  const [userName, setUserName] = useState(route.params?.userName || "Guest");
-  useEffect(() => {
-    if (route.params?.userName && userName === "Guest") {
-      setUserName(route.params.userName); // ตั้งค่า userName ที่ส่งมาจาก route.params
-    }
-  }, [route.params?.userName]); // ใช้เมื่อ route.params เปลี่ยนแปลง
+
 
   const images = [
     { id: 1, uri: require("../assets/image/krung.jpg"), title: "Drug 1" },
@@ -67,7 +63,7 @@ export default function Homepage({ route, navigation }) {
             paddingHorizontal: 30,
           }}
         >
-          Hi, Khun{userName}!
+          Hi, {fullname}
         </Text>
       </View>
       <View style={{ flex: 1, paddingLeft: 40, paddingRight: 40 }}>
@@ -390,7 +386,7 @@ export default function Homepage({ route, navigation }) {
         </Text>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate("Homepage")} // ใส่โค้ด onPress ให้ในตำแหน่งที่ถูกต้อง
+          onPress={() => navigation.navigate("Notification")} // ใส่โค้ด onPress ให้ในตำแหน่งที่ถูกต้อง
           style={{
             flexDirection: "column", // หากต้องการเพิ่มไอคอนหรือข้อความข้างๆ
             alignItems: "center",

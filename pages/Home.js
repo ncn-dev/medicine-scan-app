@@ -4,7 +4,6 @@ import { Image } from "react-native";
 const logo = require("../assets/image/1.png");
 const logo2 = require("../assets/image/3.png");
 
-//หน้าหลัก
 export default function HomeScreen({ navigation }) {
   return (
     <View style={{ flex: 1, backgroundColor: "#FFFF" }}>
