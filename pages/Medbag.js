@@ -135,6 +135,7 @@ export default function MedBag({ navigation }) {
             name={`Drug name : ${item.medicinename}`}
             dose={`Dosage : ${item.dose}`}
             date={`MFG : ${item.mfg}, EXP : ${item.exp}`}
+            item={item}
           />
         )}
         contentContainerStyle={{ paddingBottom: 10 }}

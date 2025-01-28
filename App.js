@@ -12,6 +12,7 @@ import MedBag from "./pages/Medbag";
 import SettingPage from "./pages/Settingpage";
 import Notification from "./pages/Notification";
 import Detail from "./pages/Detail";
+import Chatbot from "./pages/Chatbot";
 
 const Stack = createStackNavigator();
 
@@ -19,7 +20,7 @@ export default function App() {
   return (
     <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="MedBag"
+          initialRouteName="Home"
           screenOptions={{
             headerShown: false,
           }}
@@ -77,6 +78,11 @@ export default function App() {
          <Stack.Screen
           name="Detail"
           component={Detail}
+          options={{gestureEnabled:true}}
+        />
+           <Stack.Screen
+          name="Chatbot"
+          component={Chatbot}
           options={{gestureEnabled:true}}
         />
       </Stack.Navigator>
