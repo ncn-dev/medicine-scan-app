@@ -6,10 +6,15 @@ import {
   FlatList,
   TouchableOpacity,
 } from "react-native";
+import * as Speech from "expo-speech";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { useNavigation } from "@react-navigation/native";
 
 export default function Detail({ route }) {
   const { item } = route.params;
+  const [isLooping, setIsLooping] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentText, setCurrentText] = useState("");
 
   if (!item) {
     return <Text>Error: No data available</Text>; // ถ้าไม่มีข้อมูลให้แสดงข้อความผิดพลาด
@@ -18,6 +23,58 @@ export default function Detail({ route }) {
     console.log("Received item: ", item); // ตรวจสอบว่าข้อมูลได้รับครบถ้วน
   }, []);
 
+  const playPauseHandler = () => {
+    if (isPlaying) {
+      Speech.stop();
+    } else {
+      speakAll();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const speakAll = () => {
+    const allText = `
+      ชื่อยา: ${item.medicinename || "No data"}.
+      ขนาดยา: ${item.dose || "No data"}.
+      รูปแบบยา: ${item.form}.
+      หมายเลขทะเบียน: ${item.registrationnumber || "No data"}.
+      วันที่ผลิต: ${item.mfg || "No data"}.
+      วันที่หมดอายุ: ${item.exp || "No data"}.
+      คำเตือน: ${item.warning || "No data"}.
+      การใช้งาน: ${item.usage || "No data"}.
+      ผลข้างเคียง: ${item.effect || "No data"}.
+    `;
+    Speech.speak(allText, {
+      language: "th-TH",
+      pitch: 1.0,
+      rate: 1.0,
+      onDone: () => {
+        if (isLooping) {
+          speakAll();
+        } else {
+          setIsPlaying(false);
+        }
+      },
+    });
+  };
+
+  useEffect(() => {
+    return () => {
+      Speech.stop();
+    };
+  }, []);
+
+  const skipForward = () => {
+    Speech.stop();
+    setCurrentText(currentText.slice(10));
+    speakAll();
+  };
+
+  const skipBackward = () => {
+    Speech.stop();
+    setCurrentText(currentText.slice(0, -10));
+    speakAll();
+  };
   return (
     <View style={{ paddingHorizontal: 50, marginTop: 80 }}>
       <View
@@ -43,14 +100,117 @@ export default function Detail({ route }) {
           <Icon name="arrow-back" size={20} color="#000" />
         </TouchableOpacity>
       </View>
-      <Text style={{ fontSize: 20, marginTop: 30,  marginLeft: -5 }}> Drug Name: {item.medicinename}</Text>
-      <Text style={{ fontSize: 20, marginTop: 10 }}>Dosage: {item.dose}</Text>
-      <Text style={{ fontSize: 20, marginTop: 10 }}>
-        Manufacture Date: {item.mfg}
+      <Text style={{ fontSize: 20, marginTop: 30, marginLeft: 0 }}>
+        <Text style={{ fontWeight: "bold" }}>Drug Name: </Text>
+        <Text>{item.medicinename}</Text>
       </Text>
+
       <Text style={{ fontSize: 20, marginTop: 10 }}>
-        Expiry Date: {item.exp}
+        <Text style={{ fontWeight: "bold" }}>Dosage: </Text>
+        <Text>{item.dose}</Text>
       </Text>
-    </View>
+
+      <Text style={{ fontSize: 20, marginTop: 10 }}>
+        <Text style={{ fontWeight: "bold" }}>Form: </Text>
+        <Text>{item.form}</Text>
+      </Text>
+
+      <Text style={{ fontSize: 20, marginTop: 10 }}>
+        <Text style={{ fontWeight: "bold" }}>Registrationnumber: </Text>
+        <Text>{item.registrationnumber}</Text>
+      </Text>
+
+      <Text style={{ fontSize: 20, marginTop: 10 }}>
+        <Text style={{ fontWeight: "bold" }}>Manufacture Date: </Text>
+        <Text>{item.mfg}</Text>
+      </Text>
+
+      <Text style={{ fontSize: 20, marginTop: 10 }}>
+        <Text style={{ fontWeight: "bold" }}>Expiry Date: </Text>
+        <Text>{item.exp}</Text>
+      </Text>
+
+      <Text style={{ fontSize: 20, marginTop: 10, color: "red" }}>
+        <Text style={{ fontWeight: "bold" }}>*Warning: </Text>
+        <Text>{item.warning}</Text>
+      </Text>
+
+      <Text style={{ fontSize: 20, marginTop: 10 }}>
+        <Text style={{ fontWeight: "bold" }}>Indication: </Text>
+        <Text>{item.indication}</Text>
+      </Text>
+
+      <Text style={{ fontSize: 20, marginTop: 10 }}>
+        <Text style={{ fontWeight: "bold" }}>Usage: </Text>
+        <Text>{item.usage}</Text>
+      </Text>
+
+      <Text style={{ fontSize: 20, marginTop: 10 }}>
+        <Text style={{ fontWeight: "bold" }}>Effect: </Text>
+        <Text>{item.effect}</Text>
+      </Text>
+
+        {/* ปุ่มควบคุมการเล่น */}
+        <View style={styles.controls}>
+          {/* ปุ่มเล่นถอยหลัง 10 วินาที */}
+          <TouchableOpacity style={styles.controlButton} onPress={skipBackward}>
+            <Icon name="replay-10" size={36} color="white" />
+          </TouchableOpacity>
+
+          {/* ปุ่มเล่น/หยุด */}
+          <TouchableOpacity
+            style={styles.playPauseButton}
+            onPress={playPauseHandler}
+          >
+            <Icon
+              name={isPlaying ? "pause" : "play-arrow"}
+              size={36}
+              color="white"
+            />
+          </TouchableOpacity>
+
+          {/* ปุ่มเล่นไปข้างหน้า 10 วินาที */}
+          <TouchableOpacity style={styles.controlButton} onPress={skipForward}>
+            <Icon name="forward-10" size={36} color="white" />
+          </TouchableOpacity>
+        </View>
+
+       
+      </View>
+   
   );
 }
+
+const styles = StyleSheet.create({
+  controls: {
+    marginTop:50,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    
+  },
+  controlButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "#555",
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal:10
+  },
+  playPauseButton: {
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: "#007AFF",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loopButton: {
+    marginTop: 20,
+    padding: 10,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

@@ -83,7 +83,7 @@ export default function NextScreen({ navigation }) {
         }
       );
       alert("Image uploaded successfully.");
-      navigation.navigate("InformationScreen", { uploadedData: response.data });
+      navigation.navigate("MedBag");
 
     } catch (error) {
       console.error("error uoloading image:", error);

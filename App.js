@@ -78,7 +78,7 @@ export default function App() {
          <Stack.Screen
           name="Detail"
           component={Detail}
-          options={{gestureEnabled:true}}
+       
         />
            <Stack.Screen
           name="Chatbot"
