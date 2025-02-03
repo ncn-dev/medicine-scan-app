@@ -58,6 +58,7 @@ export default function NextScreen({ navigation }) {
     };
     openCamera();
   },[]);
+
   const uploadImage = async () => {
     if (!imageUri) {
       alert("Please select an image first.");
@@ -81,7 +82,7 @@ export default function NextScreen({ navigation }) {
           },
         }
       );
-      //alert("Image uploaded successfully.");
+      alert("Image uploaded successfully.");
       navigation.navigate("InformationScreen", { uploadedData: response.data });
 
     } catch (error) {
