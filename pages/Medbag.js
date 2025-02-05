@@ -6,6 +6,7 @@ import {
   View,
   FlatList,
   TouchableOpacity,
+  Image
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
 
@@ -26,9 +27,11 @@ export default function MedBag({ navigation }) {
     fetchData();
   }, []);
 
-  const Card = ({ name, dose, date ,item,}) => (
+  const Card = ({ name, dose, date, item, imagepath }) => (
+    
+
     <TouchableOpacity
-      onPress={() => navigation.navigate("Detail",{ item : item })}
+      onPress={() => navigation.navigate("Detail", { item: item })}
       style={{
         height: 170, // ความสูงการ์ดรวม
         borderRadius: 10,
@@ -39,6 +42,7 @@ export default function MedBag({ navigation }) {
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 5,
+        
       }}
     >
       {/* ส่วนบนของการ์ด */}
@@ -59,31 +63,38 @@ export default function MedBag({ navigation }) {
           alignItems: "flex-start",
         }}
       >
+
+        <Image
+          source={{ uri:`http://192.168.10.104:3000/api/uploads/${imagepath}`}}
+          style={{ width: 70, height: 70, borderRadius: 8, marginRight: 10, marginTop: -1, marginLeft:10}}
+        />
+        </View>
+       
         <Text
           style={{
             fontSize: 14,
             fontWeight: "bold",
             color: "#333",
-            marginLeft: 40,
-            marginTop: -10,
+            marginLeft: 90,
+            marginTop: -80,
           }}
         >
           {name}
         </Text>
         <Text
-          style={{ fontSize: 14, color: "#555", marginLeft: 40, marginTop: 1 }}
+          style={{ fontSize: 14, color: "#555", marginLeft: 90, marginTop: 10 }}
         >
           {dose}
         </Text>
         <Text
-          style={{ fontSize: 14, color: "#555", marginLeft: 40, marginTop: 1 }}
+          style={{ fontSize: 14, color: "#555", marginLeft: 90, marginTop: 10 }}
         >
           {date}
         </Text>
-      </View>
+   
     </TouchableOpacity>
   );
-
+  
   return (
     <View
       style={{
@@ -131,10 +142,12 @@ export default function MedBag({ navigation }) {
         data={data}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
+         
           <Card
             name={`Drug name : ${item.medicinename}`}
             dose={`Dosage : ${item.dose}`}
             date={`MFG : ${item.mfg}, EXP : ${item.exp}`}
+            imagepath={`${item.imagepath}`}
             item={item}
           />
         )}
