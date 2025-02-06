@@ -410,9 +410,9 @@ export default function Homepage({ route, navigation }) {
             marginRight: 10,
           }}
         >
-          <Icon name="settings" size={30} color="#FFFFFF" />
-          <Text style={{ color: "#FFFFFF", marginLeft: 5, marginTop: 2 }}>
-            Setting
+          <Icon name="logout" size={30} color="#FFFFFF" />
+          <Text style={{ color: "#FFFFFF", marginLeft: 0, marginTop: 2 }}>
+            Logout
           </Text>
         </TouchableOpacity>
       </View>
