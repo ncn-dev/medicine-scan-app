@@ -1,17 +1,13 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  TouchableOpacity,
-  Image
-} from "react-native";
+import { Text, View, FlatList, TouchableOpacity, Image, Alert } from "react-native";
+import { Swipeable } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
+
 
 export default function MedBag({ navigation }) {
   const [data, setData] = useState([]);
+
   const fetchData = async () => {
     try {
       const response = await axios.get(
@@ -27,74 +23,150 @@ export default function MedBag({ navigation }) {
     fetchData();
   }, []);
 
-  const Card = ({ name, dose, date, item, imagepath }) => (
-    
+  const isExpired = (expDate) => {
+    const today = new Date();
+    const exp = new Date(expDate);
+    console.log(exp < today);
+    return exp < today;
+  };
+  
+  const deleteData = async (id) => {
+    try{
+      const response = await axios.post(`http://192.168.10.104:3000/api/user/deletemedbag/${id}`);
+      console.log(response.data.message); // ตรวจสอบข้อความตอบกลับ
 
-    <TouchableOpacity
-      onPress={() => navigation.navigate("Detail", { item: item })}
+      setData(data.filter((item) => item.id !== id));
+    }catch(error){
+      console.error("เกิดข้อผิดพลาดในการลบ:", error);
+      Alert.alert("เกิดข้อผิดพลาด", "ไม่สามารถลบข้อมูลได้");
+    }
+  }
+ 
+  const renderRightActions = (id) => (
+    <TouchableOpacity  
       style={{
-        height: 170, // ความสูงการ์ดรวม
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: "#CC0000",
         borderRadius: 10,
-        marginVertical: 10,
-        overflow: "hidden", // ป้องกันสีล้นออกนอกการ์ด
-        elevation: 5,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        
+        width: 80,
+        height: 150,
+        marginTop: 10,
+      }}
+      onPress={() => {
+        Alert.alert("ยืนยันการลบ","คุณต้องการที่จะลบยานี้ใช่หรือไม่",[
+          {
+            text: 'ยกเลิก'
+          },
+          {
+            text: 'ยืนยัน',
+            onPress: () => {
+              deleteData(id)
+            }
+          },
+        ])
       }}
     >
-      {/* ส่วนบนของการ์ด */}
-      <View
-        style={{
-          flex: 0.3, // ส่วนบนจะ占พื้นที่ 60% ของการ์ด
-          backgroundColor: "#4682B4", // สีส่วนบน
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      ></View>
-      {/* ส่วนล่างของการ์ด */}
-      <View
-        style={{
-          flex: 0.5, // ส่วนล่างจะ占พื้นที่ 40% ของการ์ด
-          backgroundColor: "#DCDCDC", // สีส่วนล่าง
-          justifyContent: "center",
-          alignItems: "flex-start",
-        }}
-      >
-
-        <Image
-          source={{ uri:`http://192.168.10.104:3000/api/uploads/${imagepath}`}}
-          style={{ width: 70, height: 70, borderRadius: 8, marginRight: 10, marginTop: -1, marginLeft:10}}
-        />
-        </View>
-       
-        <Text
-          style={{
-            fontSize: 14,
-            fontWeight: "bold",
-            color: "#333",
-            marginLeft: 90,
-            marginTop: -80,
-          }}
-        >
-          {name}
-        </Text>
-        <Text
-          style={{ fontSize: 14, color: "#555", marginLeft: 90, marginTop: 10 }}
-        >
-          {dose}
-        </Text>
-        <Text
-          style={{ fontSize: 14, color: "#555", marginLeft: 90, marginTop: 10 }}
-        >
-          {date}
-        </Text>
-   
+      <Icon name="delete" size={30} color="#fff" />
     </TouchableOpacity>
   );
-  
+
+  const Card = ({ name, dose, date, item, imagepath }) => {
+    const expired = isExpired(item.exp);
+    return (
+      <Swipeable renderRightActions={() => renderRightActions(item.id)}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Detail", { item: item })}
+          style={{
+            height: 170, // ความสูงการ์ดรวม
+            borderRadius: 10,
+            marginVertical: 10,
+            overflow: "hidden", // ป้องกันสีล้นออกนอกการ์ด
+            elevation: 5,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 5,
+          }}
+        >
+          {/* ส่วนบนของการ์ด */}
+          <View
+            style={{
+              flex: 0.3, // ส่วนบนจะ占พื้นที่ 60% ของการ์ด
+              backgroundColor: expired ? "#FF0000" : "#4682B4", // สีส่วนบน
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                color: "Black",
+                fontSize: 18,
+              }}
+            >
+              {expired ? "*ยาของท่านหมดอายุแล้ว" : ""}
+            </Text>
+          </View>
+          {/* ส่วนล่างของการ์ด */}
+          <View
+            style={{
+              flex: 0.5, // ส่วนล่างจะ占พื้นที่ 40% ของการ์ด
+              backgroundColor: "#DCDCDC", // สีส่วนล่าง
+              justifyContent: "center",
+              alignItems: "flex-start",
+            }}
+          >
+            <Image
+              source={{
+                uri: `http://192.168.10.104:3000/api/uploads/${imagepath}`,
+              }}
+              style={{
+                width: 70,
+                height: 70,
+                borderRadius: 8,
+                marginRight: 10,
+                marginTop: -1,
+                marginLeft: 10,
+              }}
+            />
+          </View>
+
+          <Text
+            style={{
+              fontSize: 14,
+              fontWeight: "bold",
+              color: "#333",
+              marginLeft: 90,
+              marginTop: -80,
+            }}
+          >
+            {name}
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              color: "#555",
+              marginLeft: 90,
+              marginTop: 10,
+            }}
+          >
+            {dose}
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              color: "#555",
+              marginLeft: 90,
+              marginTop: 10,
+            }}
+          >
+            {date}
+          </Text>
+        </TouchableOpacity>
+      </Swipeable>
+    );
+  };
+
   return (
     <View
       style={{
@@ -142,7 +214,6 @@ export default function MedBag({ navigation }) {
         data={data}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-         
           <Card
             name={`Drug name : ${item.medicinename}`}
             dose={`Dosage : ${item.dose}`}

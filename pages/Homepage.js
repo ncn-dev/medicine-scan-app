@@ -17,7 +17,23 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 export default function Homepage({ route, navigation }) {
   const [fullname, setFullname] = useState("Nonpawit");
   const [seach, setseach] = useState("");
+  const [data, setData] = useState([]);
 
+  const fetchData = async () => {
+    try {
+      const response = await axios.get(
+        "http://192.168.10.104:3000/api/user/medbag/admin"
+      );
+      await setData(response.data);
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const images = [
     { id: 1, uri: require("../assets/image/krung.jpg"), title: "Drug 1" },
@@ -40,73 +56,73 @@ export default function Homepage({ route, navigation }) {
   const imageSize = Dimensions.get("window").width * 0.8;
 
   return (
-    <View style={{ marginTop: 10 , backgroundColor:"#FFFFFF"}}>
+    <View style={{ marginTop: 10, backgroundColor: "#FFFFFF" }}>
       <View
         style={{
           position: "absolute",
-          zIndex: 10, 
-          backgroundColor:"#FFFFFF",
-          width:"100%",
-          marginTop:-10
+          zIndex: 10,
+          backgroundColor: "#FFFFFF",
+          width: "100%",
+          marginTop: -10,
         }}
       >
-      <View
-        style={{
-          paddingTop: 70,
-          paddingLeft: 15,
-        }}
-      >
-        <Text
+        <View
           style={{
-            fontSize: 30,
-            fontWeight: "bold",
-            paddingHorizontal: 30,
+            paddingTop: 70,
+            paddingLeft: 15,
           }}
         >
-          Hi, {fullname}
-        </Text>
-      </View>
-      <View style={{ flex: 1, paddingLeft: 40, paddingRight: 40 }}>
-        <TextInput
-          style={{
-            height: 50,
-            borderColor: "#D9D9D9",
-            borderWidth: 1,
-            borderRadius: 8,
-            paddingHorizontal: 10,
-            marginVertical: 10,
-            backgroundColor: "#D9D9D9",
-            paddingLeft: 50,
-          }}
-          placeholder="Asking any question"
-        />
-        <TouchableOpacity
-          style={{
-            position: "absolute",
-            left: 10,
-            top: 30,
-            transform: [{ translateY: -10 }],
-            paddingLeft: 40,
-          }}
-          onPress={() => setseach()}
-        >
-          <Icon name="search" size={30} color="#666" />
-        </TouchableOpacity>
-      </View>
+          <Text
+            style={{
+              fontSize: 30,
+              fontWeight: "bold",
+              paddingHorizontal: 30,
+            }}
+          >
+            Hi, {fullname}
+          </Text>
+        </View>
+        <View style={{ flex: 1, paddingLeft: 40, paddingRight: 40 }}>
+          <TextInput
+            style={{
+              height: 50,
+              borderColor: "#D9D9D9",
+              borderWidth: 1,
+              borderRadius: 8,
+              paddingHorizontal: 10,
+              marginVertical: 10,
+              backgroundColor: "#D9D9D9",
+              paddingLeft: 50,
+            }}
+            placeholder="Asking any question"
+          />
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              left: 10,
+              top: 30,
+              transform: [{ translateY: -10 }],
+              paddingLeft: 40,
+            }}
+            onPress={() => setseach()}
+          >
+            <Icon name="search" size={30} color="#666" />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
 
-          backgroundColor:"#FFFFFF",
+          backgroundColor: "#FFFFFF",
           paddingVertical: 20,
         }}
       >
         <View
           style={{
             paddingHorizontal: 30,
-            marginTop:80
+            marginTop: 80,
           }}
         >
           <FlatList
@@ -139,8 +155,9 @@ export default function Homepage({ route, navigation }) {
           />
         </View>
 
-        <View
-          style={{
+        <ScrollView
+          horizontal // กำหนดให้เลื่อนได้ในแนวนอน
+          contentContainerStyle={{
             flexDirection: "row", // จัดเรียงกล่องในแนวนอน
             justifyContent: "flex-start", // จัดกล่องให้เริ่มต้นที่ซ้าย
             alignItems: "center", // จัดกล่องให้อยู่กลางในแนวตั้ง
@@ -148,119 +165,49 @@ export default function Homepage({ route, navigation }) {
             paddingHorizontal: 30, // ระยะห่างจากด้านบน
           }}
         >
-          <View
-            style={{
-              backgroundColor: "#DCDCDC", // สีพื้นหลังของ card
-              padding: 20,
-              borderRadius: 10,
-              alignItems: "center",
-              justifyContent: "center",
-              width: 150,
-              height: 150, // ขนาด card
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.2,
-              shadowRadius: 4,
-              elevation: 4,
-              marginTop: 10,
-              marginLeft: 10,
-            }}
-          >
-            <Text
+          {data.map((item) => (
+            <View
+              key={item.id} // ใช้ key ที่ไม่ซ้ำกัน (มักจะใช้ ID)
               style={{
-                fontSize: 20,
-                fontWeight: "700",
-                color: "#000",
-                marginBottom: 5,
-              }}
-            >
-              Glippizide
-            </Text>
-
-            <Text
-              style={{
-                fontSize: 12,
-                color: "gray",
-                marginBottom: 20,
-              }}
-            >
-              Remaining Doses
-            </Text>
-            <Text
-              style={{
-                fontSize: 30,
-                fontWeight: "700",
-                color: "#000",
+                backgroundColor: "#DCDCDC",
+                padding: 20,
+                borderRadius: 10,
+                alignItems: "center",
+                justifyContent: "center",
+                width: 150,
+                height: 150,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.2,
+                shadowRadius: 4,
+                elevation: 4,
+                marginTop: 10,
+                marginLeft: 10,
               }}
             >
               <Text
                 style={{
-                  fontSize: 50, // ขนาดตัวเลข
-                  fontWeight: "bold",
+                  fontSize: 10,
+                  fontWeight: "700",
+                  color: "#000",
+                  marginBottom: 5,
                 }}
               >
-                13
+                {item.medicinename}
               </Text>
-              day
-            </Text>
-          </View>
-          <View
-            style={{
-              backgroundColor: "#DCDCDC", // สีพื้นหลังของ card
-              padding: 20,
-              borderRadius: 10,
-              alignItems: "center",
-              justifyContent: "center",
-              width: 150,
-              height: 150, // ขนาด card
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.2,
-              shadowRadius: 4,
-              elevation: 4,
-              marginTop: 10,
-              marginLeft: 10,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: "700",
-                color: "#000",
-                marginBottom: 5,
-              }}
-            >
-              Glippizide
-            </Text>
 
-            <Text
-              style={{
-                fontSize: 12,
-                color: "gray",
-                marginBottom: 20,
-              }}
-            >
-              Remaining Doses
-            </Text>
-            <Text
-              style={{
-                fontSize: 30,
-                fontWeight: "700",
-                color: "#000",
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 50, // ขนาดตัวเลข
-                  fontWeight: "bold",
-                }}
-              >
-                13
+              <Text style={{ fontSize: 12, color: "gray", marginBottom: 20 }}>
+                Remaining Doses
               </Text>
-              day
-            </Text>
-          </View>
-        </View>
+
+              <Text style={{ fontSize: 30, fontWeight: "700", color: "#000" }}>
+                <Text style={{ fontSize: 50, fontWeight: "bold" }}></Text>
+                day
+              </Text>
+            </View>
+          ))}
+        </ScrollView>
+
         <View
           style={{
             marginTop: 5,
