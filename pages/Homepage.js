@@ -55,6 +55,15 @@ export default function Homepage({ route, navigation }) {
 
   const imageSize = Dimensions.get("window").width * 0.8;
 
+  const isExpired = (expDate) => {
+    const today = new Date();
+    const exp = new Date(expDate);
+    const diffTime = exp - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    //console.log(diffDays);
+    return diffDays;
+  };
+
   return (
     <View style={{ marginTop: 10, backgroundColor: "#FFFFFF" }}>
       <View
@@ -157,25 +166,31 @@ export default function Homepage({ route, navigation }) {
 
         <ScrollView
           horizontal // กำหนดให้เลื่อนได้ในแนวนอน
+          showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
             flexDirection: "row", // จัดเรียงกล่องในแนวนอน
             justifyContent: "flex-start", // จัดกล่องให้เริ่มต้นที่ซ้าย
             alignItems: "center", // จัดกล่องให้อยู่กลางในแนวตั้ง
             marginTop: 10,
             paddingHorizontal: 30, // ระยะห่างจากด้านบน
+          
           }}
         >
-          {data.map((item) => (
+          {data.map((item) => {
+            console.log(expired);
+            const expired = isExpired(item.exp);
+            return(
             <View
               key={item.id} // ใช้ key ที่ไม่ซ้ำกัน (มักจะใช้ ID)
               style={{
-                backgroundColor: "#DCDCDC",
+                backgroundColor:  "#DCDCDC",
                 padding: 20,
                 borderRadius: 10,
                 alignItems: "center",
                 justifyContent: "center",
-                width: 150,
-                height: 150,
+                minwidth: 150,
+                maxWidt: 250,
+                height: "auto",
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.2,
@@ -187,25 +202,38 @@ export default function Homepage({ route, navigation }) {
             >
               <Text
                 style={{
-                  fontSize: 10,
+                  fontSize: 20,
                   fontWeight: "700",
                   color: "#000",
                   marginBottom: 5,
+                  textAlign: "center",
+                  flexWrap: "wrap",
                 }}
+                numberOfLines={2}
+                ellipsizeMode="tail"
               >
                 {item.medicinename}
               </Text>
 
-              <Text style={{ fontSize: 12, color: "gray", marginBottom: 20 }}>
-                Remaining Doses
+              <Text style={{ fontSize: 15, color: expired < 0 ? "#FF0000" : "gray", marginBottom: 20, fontWeight:"bold" }}>
+                
+                {expired < 0 ? "*ยาของคุณหมดอายุแล้ว*" : "วันที่คงเหลือก่อนยาหมดอายุ"}
               </Text>
 
-              <Text style={{ fontSize: 30, fontWeight: "700", color: "#000" }}>
-                <Text style={{ fontSize: 50, fontWeight: "bold" }}></Text>
-                day
+              <Text style={{ 
+                fontSize: 25, 
+                fontWeight: "700", 
+                color: expired < 0 ? "#FF0000" : "#000000"
+                }}
+                >
+                
+                {expired} day
               </Text>
+
+              
             </View>
-          ))}
+            );
+          })}
         </ScrollView>
 
         <View
@@ -227,7 +255,11 @@ export default function Homepage({ route, navigation }) {
             >
               Go to my Medicine Bag,
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("MedBag")}>
+
+            <TouchableOpacity 
+              onPress={() => navigation.navigate("MedBag")}
+            >
+
               <Text
                 style={{
                   marginTop: 20,

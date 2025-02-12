@@ -285,6 +285,7 @@ export default function RegisterScreen({ navigation }) {
               >
                 Already have account,
               </Text>
+              
               <TouchableOpacity onPress={() => navigation.navigate("Login")}>
                 <Text
                   style={{
