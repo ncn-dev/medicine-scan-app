@@ -215,8 +215,8 @@ export default function MedBag({ navigation }) {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Card
-            name={`Drug name : ${item.medicinename}`}
-            dose={`Dosage : ${item.dose}`}
+            name={`ชื่อยา : ${item.medicinename}`}
+            dose={`ขนาดยา : ${item.dose}`}
             date={`MFG : ${item.mfg}, EXP : ${item.exp}`}
             imagepath={`${item.imagepath}`}
             item={item}

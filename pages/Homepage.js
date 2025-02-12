@@ -173,65 +173,70 @@ export default function Homepage({ route, navigation }) {
             alignItems: "center", // จัดกล่องให้อยู่กลางในแนวตั้ง
             marginTop: 10,
             paddingHorizontal: 30, // ระยะห่างจากด้านบน
-          
           }}
         >
           {data.map((item) => {
             console.log(expired);
             const expired = isExpired(item.exp);
-            return(
-            <View
-              key={item.id} // ใช้ key ที่ไม่ซ้ำกัน (มักจะใช้ ID)
-              style={{
-                backgroundColor:  "#DCDCDC",
-                padding: 20,
-                borderRadius: 10,
-                alignItems: "center",
-                justifyContent: "center",
-                minwidth: 150,
-                maxWidt: 250,
-                height: "auto",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.2,
-                shadowRadius: 4,
-                elevation: 4,
-                marginTop: 10,
-                marginLeft: 10,
-              }}
-            >
-              <Text
+            return (
+              <View
+                key={item.id} // ใช้ key ที่ไม่ซ้ำกัน (มักจะใช้ ID)
                 style={{
-                  fontSize: 20,
-                  fontWeight: "700",
-                  color: "#000",
-                  marginBottom: 5,
-                  textAlign: "center",
-                  flexWrap: "wrap",
+                  backgroundColor: "#DCDCDC",
+                  padding: 20,
+                  borderRadius: 10,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minwidth: 150,
+                  maxWidt: 250,
+                  height: "auto",
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.2,
+                  shadowRadius: 4,
+                  elevation: 4,
+                  marginTop: 10,
+                  marginLeft: 10,
                 }}
-                numberOfLines={2}
-                ellipsizeMode="tail"
               >
-                {item.medicinename}
-              </Text>
-
-              <Text style={{ fontSize: 15, color: expired < 0 ? "#FF0000" : "gray", marginBottom: 20, fontWeight:"bold" }}>
-                
-                {expired < 0 ? "*ยาของคุณหมดอายุแล้ว*" : "วันที่คงเหลือก่อนยาหมดอายุ"}
-              </Text>
-
-              <Text style={{ 
-                fontSize: 25, 
-                fontWeight: "700", 
-                color: expired < 0 ? "#FF0000" : "#000000"
-                }}
+                <Text
+                  style={{
+                    fontSize: 20,
+                    fontWeight: "700",
+                    color: "#000",
+                    marginBottom: 5,
+                    textAlign: "center",
+                    flexWrap: "wrap",
+                  }}
+                  numberOfLines={2}
+                  ellipsizeMode="tail"
                 >
-                
-                {expired} day
-              </Text>
+                  {item.medicinename}
+                </Text>
 
-              
-            </View>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    color: expired < 0 ? "#FF0000" : "gray",
+                    marginBottom: 20,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {expired < 0
+                    ? "*ยาของคุณหมดอายุแล้ว*"
+                    : "วันที่คงเหลือก่อนยาหมดอายุ"}
+                </Text>
+
+                <Text
+                  style={{
+                    fontSize: 25,
+                    fontWeight: "700",
+                    color: expired < 0 ? "#FF0000" : "#000000",
+                  }}
+                >
+                 {expired} วัน {expired < 0 ? "❌" : "✅"}
+                </Text>
+              </View>
             );
           })}
         </ScrollView>
@@ -256,10 +261,7 @@ export default function Homepage({ route, navigation }) {
               Go to my Medicine Bag,
             </Text>
 
-            <TouchableOpacity 
-              onPress={() => navigation.navigate("MedBag")}
-            >
-
+            <TouchableOpacity onPress={() => navigation.navigate("MedBag")}>
               <Text
                 style={{
                   marginTop: 20,
