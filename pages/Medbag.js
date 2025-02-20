@@ -11,7 +11,7 @@ export default function MedBag({ navigation }) {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "http://192.168.10.104:3000/api/user/medbag/admin"
+        "http://172.20.10.2:3000/api/user/medbag/admin"
       );
       await setData(response.data);
       console.log(data);
@@ -32,7 +32,7 @@ export default function MedBag({ navigation }) {
   
   const deleteData = async (id) => {
     try{
-      const response = await axios.post(`http://192.168.10.104:3000/api/user/deletemedbag/${id}`);
+      const response = await axios.post(`http://172.20.10.2:3000/api/user/deletemedbag/${id}`);
       console.log(response.data.message); // ตรวจสอบข้อความตอบกลับ
 
       setData(data.filter((item) => item.id !== id));
@@ -118,7 +118,7 @@ export default function MedBag({ navigation }) {
           >
             <Image
               source={{
-                uri: `http://192.168.10.104:3000/api/uploads/${imagepath}`,
+                uri: `http://172.20.10.2:3000/api/uploads/${imagepath}`,
               }}
               style={{
                 width: 70,

@@ -112,7 +112,7 @@ export default function Detail({ route, navigation }) {
         </View>
         <Image
           source={{
-            uri: `http://192.168.10.104:3000/api/uploads/${item.imagepath}`,
+            uri: `http://172.20.10.2:3000/api/uploads/${item.imagepath}`,
           }}
           style={{
             width: 270,

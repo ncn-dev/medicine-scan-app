@@ -62,7 +62,7 @@ export default function RegisterScreen({ navigation }) {
     // console.log(formData);
     try {
       const response = await axios.post(
-        "http://192.168.10.104:3000/api/auth/register",
+        "http://172.20.10.2:3000/api/auth/register",
         data,
       );
       if (!response.ok) {

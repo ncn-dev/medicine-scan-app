@@ -115,7 +115,7 @@ export default function ChatScreen({ navigation }) {
     });
     try {
       const response = await axios.post(
-        "http://192.168.10.104:3000/api/images/uploads",
+        "http://172.20.10.2:3000/api/images/uploads",
         formData,
         {
           headers: {
