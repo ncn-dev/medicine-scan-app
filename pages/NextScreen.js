@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 import axios from "axios";
 import {
   Button,
@@ -74,7 +75,7 @@ export default function NextScreen({ navigation }) {
 
     try {
       const response = await axios.post(
-        "http://172.20.10.2:3000/api/images/uploads",
+        `http://192.168.10.104:3000/api/images/uploads`,
         formData,
         {
           headers: {

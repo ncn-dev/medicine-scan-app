@@ -11,7 +11,7 @@ export default function MedBag({ navigation }) {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "http://172.20.10.2:3000/api/user/medbag/admin"
+        `http://172.20.10.3:3000/api/user/medbag/admin`
       );
       await setData(response.data);
       console.log(data);
@@ -32,7 +32,7 @@ export default function MedBag({ navigation }) {
   
   const deleteData = async (id) => {
     try{
-      const response = await axios.post(`http://172.20.10.2:3000/api/user/deletemedbag/${id}`);
+      const response = await axios.post(`http://172.20.10.3:3000/api/user/deletemedbag/${id}`);
       console.log(response.data.message); // ตรวจสอบข้อความตอบกลับ
 
       setData(data.filter((item) => item.id !== id));
@@ -50,7 +50,7 @@ export default function MedBag({ navigation }) {
         backgroundColor: "#CC0000",
         borderRadius: 10,
         width: 80,
-        height: 150,
+        height: 140,
         marginTop: 10,
       }}
       onPress={() => {
@@ -83,10 +83,10 @@ export default function MedBag({ navigation }) {
             marginVertical: 10,
             overflow: "hidden", // ป้องกันสีล้นออกนอกการ์ด
             elevation: 5,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.2,
-            shadowRadius: 5,
+            // shadowColor: "#000",
+            // shadowOffset: { width: 0, height: 2 },
+            // shadowOpacity: 0.2,
+            // shadowRadius: 5,
           }}
         >
           {/* ส่วนบนของการ์ด */}
@@ -118,7 +118,7 @@ export default function MedBag({ navigation }) {
           >
             <Image
               source={{
-                uri: `http://172.20.10.2:3000/api/uploads/${imagepath}`,
+                uri: `http://172.20.10.3:3000/api/uploads/${imagepath}`,
               }}
               style={{
                 width: 70,

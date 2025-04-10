@@ -16,27 +16,38 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import axios from "axios";
 import { ActivityIndicator } from "react-native-paper";
 
+
 export default function ChatScreen({ navigation }) {
   const [isUploading, setIsUploading] = useState(false);
   const [messages, setMessages] = useState([
-    { id: "1", text: "สวัสดีครับ!", sender: "other", imageUri: null },
-    { id: "2", text: "มีอะไรให้ช่วยไหมครับ?", sender: "other", imageUri: null },
-    { id: "3", text: "อยากได้ mockup แชทครับ", sender: "me", imageUri: null },
+    {
+      id: "1", text: "สวัสดีค่ะ อยากสอบถามข้อมูลเกี่ยวกับยาอะไรไหมครับ!", sender: "other", imageUri: null
+    }
+    // { id: "1", text: "สวัสดีครับ!", sender: "other", imageUri: null },
+    // { id: "2", text: "มีอะไรให้ช่วยไหมครับ?", sender: "other", imageUri: null },
+    // { id: "3", text: "อยากได้ mockup แชทครับ", sender: "me", imageUri: null },
   ]);
 
   const [input, setInput] = useState("");
 
-  const sendMessage = () => {
+  const sendMessage = async () => {
+    setInput("");
     if (input.trim() === "") return;
     setMessages((prevMessages) => [
         { id: Date.now().toString(), text: input, sender: "me" },
       ...prevMessages,
     ]);
-
     try{
-        let replyText = "1";
-        if(replyText !== ""){
-            replyText ="1";
+    const data = {
+      "text" : input
+    }
+    const response = await axios.post(`http://192.168.10.104:3000/api/chatbot`, data);
+    console.log(response.data.reply_message)
+    
+
+        let replyText = response.data.reply_message;
+        if(!replyText){
+            replyText ="ระบบขัดข้องกรุณาสอบถามใหม่อีกครั้งครับ";
         }
 
         setMessages((prevMessages)=>[
@@ -49,7 +60,7 @@ export default function ChatScreen({ navigation }) {
 
 
     
-    setInput("");
+
   };
 
   const renderMessage = ({ item }) => (
@@ -115,7 +126,7 @@ export default function ChatScreen({ navigation }) {
     });
     try {
       const response = await axios.post(
-        "http://172.20.10.2:3000/api/images/uploads",
+        `http://172.20.10.3:3000/api/images/uploads`,
         formData,
         {
           headers: {

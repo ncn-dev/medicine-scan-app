@@ -22,7 +22,7 @@ export default function Homepage({ route, navigation }) {
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        "http://172.20.10.2:3000/api/user/medbag/admin"
+        `http://172.20.10.3:3000/api/user/medbag/admin`
       );
       await setData(response.data);
       console.log(data);

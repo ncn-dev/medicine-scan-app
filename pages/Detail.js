@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useEffect, useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -7,55 +8,229 @@ import {
   TouchableOpacity,
   Image,
   ScrollView,
+  Alert,
+  Modal,
+  TextInput,
 } from "react-native";
-import * as Speech from "expo-speech";
+import axios from "axios";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { useNavigation } from "@react-navigation/native";
+import * as Speech from "expo-speech";
+import { Animated } from "react-native";
 
 export default function Detail({ route, navigation }) {
   const { item } = route.params;
-  const [isLooping, setIsLooping] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentText, setCurrentText] = useState("");
-  const [playingStates, setPlayingStates] = useState({});
+  const [editedItem, setEditedItem] = useState(item);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedField, setSelectedField] = useState(null);
+  const [inputValue, setInputValue] = useState("");
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [speakingKey, setSpeakingKey] = useState(null);
+  const [duration, setDuration] = useState(8); // 8 วินาทีโดยประมาณ
+  const [currentTime, setCurrentTime] = useState(0);
+  const timerRef = React.useRef(null);
+  const progress = useState(new Animated.Value(0))[0];
+  const [isPlayingAll, setIsPlayingAll] = useState(false);
 
+  const formatTime = (secs) => {
+    const minutes = Math.floor(secs / 60).toString().padStart(2, "0");
+    const seconds = (secs % 60).toString().padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  };
 
-  if (!item) {
-    return <Text>Error: No data available</Text>; // ถ้าไม่มีข้อมูลให้แสดงข้อความผิดพลาด
-  }
+  const detailList = [
+    { id: 1, key: "medicinename", label: "ชื่อยา" },
+    { id: 2, key: "dose", label: "ปริมาณยา" },
+    { id: 5, key: "mfg", label: "วันที่ผลิต" },
+    { id: 6, key: "exp", label: "วันที่หมดอายุ" },
+    { id: 7, key: "warning", label: "คำเตือน" },
+    { id: 9, key: "usage", label: "วิธีการใช้" },
+    { id: 10, key: "effect", label: "ผลข้างเคียง" },
+  ];
   useEffect(() => {
-    console.log("Received item: ", item); // ตรวจสอบว่าข้อมูลได้รับครบถ้วน
-  }, []);
+    const combinedText = detailList
+      .map((item) => `${item.label}: ${editedItem[item.key]}`)
+      .join(". ");
+  
+    const avgCharsPerSec = 706``; // ประมาณการความเร็วพูด
+    const estimatedDuration = Math.ceil(combinedText.length / avgCharsPerSec);
+    setDuration(estimatedDuration);
+  }, [editedItem]);
 
-  const speakText = (key, label, text) => {
-    // หยุดการอ่านก่อนหน้า
-    Speech.stop();
-  
-    // ถ้ามีการเล่นอยู่ -> หยุดเสียงและตั้งค่าเป็น false
-    if (playingStates[key]) {
-      setPlayingStates((prev) => ({ ...prev, [key]: false }));
+  const speakText = (key, text) => {
+    if (speakingKey === key) {
+      Speech.stop();
+      setSpeakingKey(null);
     } else {
-      // อ่านข้อความออกเสียง
-      Speech.speak(`${label} ${text}`, { language: "th-TH", pitch: 1.0, rate: 1.0 });
-  
-      // อัปเดต state ให้ปุ่มนี้เป็น isPlaying: true
-      setPlayingStates((prev) => ({ ...prev, [key]: true }));
-  
-      // ตั้งค่าให้หยุดเล่นเมื่ออ่านจบ
-      setTimeout(() => {
-        setPlayingStates((prev) => ({ ...prev, [key]: false }));
-      }, 3000); // ปรับเวลาตามระยะเวลาการอ่าน
+      Speech.stop();
+      setSpeakingKey(key);
+      Speech.speak(text, {
+        language: "th-TH",
+        rate: 1.0,
+        pitch: 1.0,
+        onDone: () => setSpeakingKey(false),
+        onStopped: () => setSpeakingKey(false),
+      });
     }
   };
+
+  const speakAllDetails = () => {
+    if (isPlayingAll) {
+      Speech.stop();
+      setSpeakingKey(null);
+      setIsPlayingAll(false);
+      progress.setValue(0);
+      clearInterval(timerRef.current);
+      setCurrentTime(0);
+    } else {
+      const combinedText = detailList
+        .map((item) => `${item.label}: ${editedItem[item.key]}`)
+        .join(". ");
+
+      setSpeakingKey("all");
+      setIsPlayingAll(true);
+      setCurrentTime(0);
+
+      Animated.timing(progress, {
+        toValue: 1,
+        duration: duration * 1000,
+        useNativeDriver: false,
+      }).start();
+
+      timerRef.current = setInterval(() => {
+        setCurrentTime((prev) => {
+          if (prev >= duration) {
+            clearInterval(timerRef.current);
+            return duration;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+
+      Speech.speak(combinedText, {
+        language: "th-TH",
+        rate: 1.0,
+        pitch: 1.0,
+        onDone: () => {
+          setSpeakingKey(null);
+          setIsPlayingAll(false);
+          progress.setValue(0);
+          clearInterval(timerRef.current);
+          setCurrentTime(0);
+        },
+        onStopped: () => {
+          setSpeakingKey(null);
+          setIsPlayingAll(false);
+          progress.setValue(0);
+          clearInterval(timerRef.current);
+          setCurrentTime(0);
+        },
+      });
+    }
+  };
+
+  const openEditModal = (key, value) => {
+    setSelectedField(key);
+    setInputValue(value);
+    setModalVisible(true);
+  };
+  const saveEdit = () => {
+    setEditedItem((prev) => ({
+      ...prev,
+      [selectedField]: inputValue,
+    }));
+    setModalVisible(false);
+  };
+
+  const updatingData = async (id) => {
+    const data = {
+      id: editedItem.id,
+      medicinename: editedItem.medicinename,
+      dose: editedItem.dose,
+      form: editedItem.form,
+      registrationnumber: editedItem.registrationnumber,
+      mfg: editedItem.mfg,
+      exp: editedItem.exp,
+      warning: editedItem.warning,
+      indication: editedItem.indication,
+      usage: editedItem.usage,
+      effect: editedItem.effect,
+    };
+    try {
+      const response = await axios.post(
+        `http://172.20.10.3:3000/api/user/updatemedbag`,
+        data
+      );
+      if (!response.ok) {
+        alert("Data updated successfully");
+        console.log("Data updated successfully");
+      } else {
+        console.log("Update is failed");
+      }
+    } catch (err) {
+      console.log.error(err);
+    }
+  };
+
   return (
     <ScrollView
       contentContainerStyle={{
         flexGrow: 1,
-
         backgroundColor: "#FFFFFF",
         paddingVertical: 20,
       }}
     >
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)",
+          }}
+        >
+          <View
+            style={{
+              width: 300,
+              padding: 20,
+              backgroundColor: "white",
+              borderRadius: 10,
+            }}
+          >
+            <Text style={{ fontSize: 18 }}>แก้ไขข้อมูล</Text>
+            <TextInput
+              style={{
+                marginTop: 15,
+                backgroundColor: "#F5F5F5",
+                height: 40,
+                paddingLeft: 10,
+              }}
+              placeholder="empty"
+              value={inputValue}
+              onChangeText={setInputValue}
+            />
+            <TouchableOpacity
+              onPress={saveEdit}
+              style={{ alignItems: "flex-end" }}
+            >
+              <Text
+                style={{
+                  marginTop: 20,
+                  fontSize: 18,
+                  fontWeight: "bold",
+                  color: "green",
+                }}
+              >
+                Save
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
       <View style={{ paddingHorizontal: 50, marginTop: 80 }}>
         <View
           style={{
@@ -82,7 +257,7 @@ export default function Detail({ route, navigation }) {
         </View>
         <Image
           source={{
-            uri: `http://172.20.10.2:3000/api/uploads/${item.imagepath}`,
+            uri: `http://192.168.10.104:3000/api/uploads/${editedItem.imagepath}`,
           }}
           style={{
             width: 270,
@@ -93,487 +268,150 @@ export default function Detail({ route, navigation }) {
             marginLeft: 10,
           }}
         />
-        <View
-          style={{
-            marginTop: 30,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            
+
+        {detailList.map((item) => (
+          <View
+            key={item.id}
+            style={{
+              marginTop: 30,
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 35,
+                backgroundColor: "#007AFF",
+                justifyContent: "center",
+                alignItems: "center",
+                marginRight: 10,
+              }}
+              onPress={() =>
+                speakText(item.key, `${item.label}:${editedItem[item.key]}`)
+              }
+            >
+              <Icon
+                name={speakingKey === item.key ? "pause" : "play-arrow"}
+                size={25}
+                color="white"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={{
+                backgroundColor: "#D9D9D9",
+                padding: 10,
+                borderRadius: 10,
+                marginTop: 5,
+                width: "100%",
+                height: 70,
+              }}
+              onPress={() => {
+                openEditModal(item.key, editedItem[item.key]);
+              }}
+            >
+              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                {item.label}: {editedItem[item.key]}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+
+        <View 
+          style={{ 
+            marginTop: 40, 
+            alignItems: "center", 
+            backgroundColor: "#FDF5E6",
+            borderRadius:20
           }}
         >
-          {/* ปุ่มเล่นถอยหลัง 10 วินาที */}
-          <TouchableOpacity
+          <Text style={{marginTop:10, fontSize: 16, fontWeight:'bold'}}>🔊 ฟังข้อมูลยาทั้งหมด</Text>
+          {/* แถบเวลา */}
+          <View
+            style={{ marginTop:10, width: "100%", flexDirection: "row", alignItems: "center" }}
+          >
+            <Text style={{ fontWeight: "bold", width: 50 }}>
+              {formatTime(currentTime)}
+            </Text>
+
+            <View
+              style={{
+                flex: 1,
+                height: 6,
+                backgroundColor: "#ccc",
+                borderRadius: 5,
+                marginHorizontal: 10,
+              }}
+            >
+              <Animated.View
+                style={{
+                  height: 6,
+                  backgroundColor: "#0D0D21",
+                  borderRadius: 5,
+                  width: progress.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: ["0%", "100%"],
+                  }),
+                }}
+              />
+            </View>
+
+            <Text style={{ fontWeight: "bold", width: 50 }}>
+              {formatTime(duration)}
+            </Text>
+          </View>
+
+          {/* ปุ่มควบคุม */}
+          <View
             style={{
-              width: 40,
-              height: 40,
-              borderRadius: 35,
-              backgroundColor: playingStates["ชื่อยา"] ? "#00CC00" : "#007AFF",
+              flexDirection: "row",
               justifyContent: "center",
               alignItems: "center",
-              marginRight:10
-            }}
-            onPress={() =>{ 
-              speakText("ชื่อยา", "ชื่อยา",item.medicinename)
-              setIsPlaying(!isPlaying)
+              marginTop: 20,
             }}
           >
-            <Icon
-              name={playingStates["ชื่อยา"] ? "pause" : "play-arrow"}
-              size={25}
-              color="white"
-            />
-          </TouchableOpacity>
+            <TouchableOpacity style={{ marginHorizontal: 20 }}>
+              <Icon name="skip-previous" size={35} color="#0D0D21" />
+            </TouchableOpacity>
 
-          <Text
-            style={{
-              backgroundColor: "#D9D9D9",
-              padding: 10,
-              borderRadius: 10,
-              marginTop: 5,
-              width: "100%",
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              ชื่อยา:{" "}
-            </Text>
-            <Text style={{ fontSize: 18 }}>{item.medicinename}</Text>
-          </Text>
+            <TouchableOpacity onPress={speakAllDetails}>
+              <Icon
+                name={isPlayingAll ? "pause" : "play-arrow"}
+                size={45}
+                color="#0D0D21"
+              />
+            </TouchableOpacity>
+
+            <TouchableOpacity style={{ marginHorizontal: 20 }}>
+              <Icon name="skip-next" size={35} color="#0D0D21" />
+            </TouchableOpacity>
+          </View>
         </View>
 
-        <View
-          style={{
-            marginTop: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            
-          }}
-        >
-          {/* ปุ่มเล่นถอยหลัง 10 วินาที */}
+        <View style={{ justifyContent: "center", alignItems: "center" }}>
           <TouchableOpacity
             style={{
-              width: 40,
-              height: 40,
-              borderRadius: 35,
-              backgroundColor: playingStates["ปริมาณยา"] ? "#00CC00" : "#007AFF",
               justifyContent: "center",
               alignItems: "center",
-              marginRight:10
+              backgroundColor: "#33CC00",
+              borderRadius: 9,
+              width: 100,
+              height: 60,
+              marginTop: 30,
+              paddingVertical: 5,
             }}
-            onPress={() => speakText( "ปริมาณยา", "ปริมาณยา",item.dose)}
+            onPress={() => {
+              updatingData(item.id);
+            }}
           >
-            <Icon
-              name={playingStates["ปริมาณยา"] ? "pause" : "play-arrow"}
-              size={25}
-              color="white"
-            />
+            <Icon name="save" size={29} color="#fff" />
+            <Text style={{ color: "white", fontWeight: "bold" }}>update</Text>
           </TouchableOpacity>
-
-          <Text
-            style={{
-              backgroundColor: "#D9D9D9",
-              padding: 10,
-              borderRadius: 10,
-              marginTop: 5,
-              width: "100%",
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              ปริมาณยา:{" "}
-            </Text>
-            <Text style={{ fontSize: 18 }}>{item.dose}</Text>
-          </Text>
         </View>
-
-        
-        <View
-          style={{
-            marginTop: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            
-          }}
-        >
-          {/* ปุ่มเล่นถอยหลัง 10 วินาที */}
-          <TouchableOpacity
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 35,
-              backgroundColor: playingStates["รูปแบบเภสัชภัณฑ์"] ? "#00CC00" : "#007AFF",
-              justifyContent: "center",
-              alignItems: "center",
-              marginRight:10
-            }}
-            onPress={() => speakText("รูปแบบเภสัชภัณฑ์", "รูปแบบเภสัชภัณฑ์",item.form)}
-          >
-            <Icon
-              name={playingStates["รูปแบบเภสัชภัณฑ์"] ? "pause" : "play-arrow"}
-              size={25}
-              color="white"
-            />
-          </TouchableOpacity>
-
-          <Text
-            style={{
-              backgroundColor: "#D9D9D9",
-              padding: 10,
-              borderRadius: 10,
-              marginTop: 5,
-              width: "100%",
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                รูปแบบเภสัชภัณฑ์:{" "}
-            </Text>
-            <Text style={{ fontSize: 18 }}>{item.form}</Text>
-          </Text>
-        </View>
-
-        <View
-          style={{
-            marginTop: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            
-          }}
-        >
-          {/* ปุ่มเล่นถอยหลัง 10 วินาที */}
-          <TouchableOpacity
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 35,
-              backgroundColor: playingStates["เลขทะเบียนยา"] ? "#00CC00" : "#007AFF",
-              justifyContent: "center",
-              alignItems: "center",
-              marginRight:10
-            }}
-            onPress={() => speakText("เลขทะเบียนยา", "เลขทะเบียนยา",item.registrationnumber)}
-          >
-            <Icon
-              name={playingStates["เลขทะเบียนยา"] ? "pause" : "play-arrow"}
-              size={25}
-              color="white"
-            />
-          </TouchableOpacity>
-
-          <Text
-            style={{
-              backgroundColor: "#D9D9D9",
-              padding: 10,
-              borderRadius: 10,
-              marginTop: 5,
-              width: "100%",
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              เลขทะเบียนยา:{" "}
-            </Text>
-            <Text style={{ fontSize: 18 }}>{item.registrationnumber}</Text>
-          </Text>
-        </View>
-
-        <View
-          style={{
-            marginTop: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            
-          }}
-        >
-          {/* ปุ่มเล่นถอยหลัง 10 วินาที */}
-          <TouchableOpacity
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 35,
-              backgroundColor: playingStates["วันที่ผลิต"] ? "#00CC00" : "#007AFF",
-              justifyContent: "center",
-              alignItems: "center",
-              marginRight:10
-            }}
-            onPress={() => speakText("วันที่ผลิต", "วันที่ผลิต",item.mfg)}
-          >
-            <Icon
-              name={playingStates["วันที่ผลิต"] ? "pause" : "play-arrow"}
-              size={25}
-              color="white"
-            />
-          </TouchableOpacity>
-
-          <Text
-            style={{
-              backgroundColor: "#D9D9D9",
-              padding: 10,
-              borderRadius: 10,
-              marginTop: 5,
-              width: "100%",
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              วันที่ผลิต:{" "}
-            </Text>
-            <Text style={{ fontSize: 18 }}>{item.mfg}</Text>
-          </Text>
-        </View>
-
-        <View
-          style={{
-            marginTop: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            
-          }}
-        >
-          {/* ปุ่มเล่นถอยหลัง 10 วินาที */}
-          <TouchableOpacity
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 35,
-              backgroundColor: playingStates["วันหมดอายุ"] ? "#00CC00" : "#007AFF",
-              justifyContent: "center",
-              alignItems: "center",
-              marginRight:10
-            }}
-            onPress={() => speakText("วันหมดอายุ", "วันหมดอายุ",item.exp)}
-          >
-            <Icon
-              name={playingStates["วันหมดอายุ"] ? "pause" : "play-arrow"}
-              size={25}
-              color="white"
-            />
-          </TouchableOpacity>
-
-          <Text
-            style={{
-              backgroundColor: "#D9D9D9",
-              padding: 10,
-              borderRadius: 10,
-              marginTop: 5,
-              width: "100%",
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              วันหมดอายุ:{" "}
-            </Text>
-            <Text style={{ fontSize: 18 }}>{item.exp}</Text>
-          </Text>
-        </View>
-
-        <View
-          style={{
-            marginTop: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            
-          }}
-        >
-          {/* ปุ่มเล่นถอยหลัง 10 วินาที */}
-          <TouchableOpacity
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 35,
-              backgroundColor: playingStates["คำเตือน"] ? "#00CC00" : "#007AFF",
-              justifyContent: "center",
-              alignItems: "center",
-              marginRight:10
-            }}
-            onPress={() => speakText("คำเตือน", "คำเตือน",item.warning)}
-          >
-            <Icon
-              name={playingStates["คำเตือน"] ? "pause" : "play-arrow"}
-              size={25}
-              color="white"
-            />
-          </TouchableOpacity>
-
-          <Text
-            style={{
-              backgroundColor: "#D9D9D9",
-              padding: 10,
-              borderRadius: 10,
-              marginTop: 5,
-              width: "100%",
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "bold", color:"red"}}>
-              **คำเตือน:{" "}
-            </Text>
-            <Text style={{ fontSize: 18, color:"red" }}>{item.warning}</Text>
-          </Text>
-        </View>
-
-        <View
-          style={{
-            marginTop: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            
-          }}
-        >
-          {/* ปุ่มเล่นถอยหลัง 10 วินาที */}
-          <TouchableOpacity
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 35,
-              backgroundColor: playingStates["ข้อบ่งชี้"] ? "#00CC00" : "#007AFF",
-              justifyContent: "center",
-              alignItems: "center",
-              marginRight:10
-            }}
-            onPress={() => speakText("ข้อบ่งชี้", "ข้อบ่งชี้",item.indication)}
-          >
-            <Icon
-              name={playingStates["ข้อบ่งชี้"] ? "pause" : "play-arrow"}
-              size={25}
-              color="white"
-            />
-          </TouchableOpacity>
-
-          <Text
-            style={{
-              backgroundColor: "#D9D9D9",
-              padding: 10,
-              borderRadius: 10,
-              marginTop: 5,
-              width: "100%",
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              ข้อบ่งชี้:{" "}
-            </Text>
-            <Text style={{ fontSize: 18 }}>{item.indication}</Text>
-          </Text>
-        </View>
-
-        <View
-          style={{
-            marginTop: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            
-          }}
-        >
-          {/* ปุ่มเล่นถอยหลัง 10 วินาที */}
-          <TouchableOpacity
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 35,
-              backgroundColor: playingStates["วิธีการใช้งาน"] ? "#00CC00" : "#007AFF",
-              justifyContent: "center",
-              alignItems: "center",
-              marginRight:10
-            }}
-            onPress={() => speakText("วิธีการใช้งาน", "วิธีการใช้งาน",item.usage)}
-          >
-            <Icon
-              name={playingStates["วิธีการใช้งาน"] ? "pause" : "play-arrow"}
-              size={25}
-              color="white"
-            />
-          </TouchableOpacity>
-
-          <Text
-            style={{
-              backgroundColor: "#D9D9D9",
-              padding: 10,
-              borderRadius: 10,
-              marginTop: 5,
-              width: "100%",
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              วิธีการใช้งาน:{" "}
-            </Text>
-            <Text style={{ fontSize: 18 }}>{item.usage}</Text>
-          </Text>
-        </View>
-
-        <View
-          style={{
-            marginTop: 10,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            
-          }}
-        >
-          {/* ปุ่มเล่นถอยหลัง 10 วินาที */}
-          <TouchableOpacity
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 35,
-              backgroundColor: playingStates["ผลกระทบ"] ? "#00CC00" : "#007AFF",
-              justifyContent: "center",
-              alignItems: "center",
-              marginRight:10
-            }}
-            onPress={() => speakText("ผลกระทบ", "ผลกระทบ",item.effect)}
-          >
-            <Icon
-              name={playingStates["ผลกระทบ"] ? "pause" : "play-arrow"}
-              size={25}
-              color="white"
-            />
-          </TouchableOpacity>
-
-          <Text
-            style={{
-              backgroundColor: "#D9D9D9",
-              padding: 10,
-              borderRadius: 10,
-              marginTop: 5,
-              width: "100%",
-            }}
-          >
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-              ผลกระทบ:{" "}
-            </Text>
-            <Text style={{ fontSize: 18 }}>{item.effect}</Text>
-          </Text>
-        </View>
-       
       </View>
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  controls: {
-    marginTop: 30,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  controlButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "#555",
-    justifyContent: "center",
-    alignItems: "center",
-    marginHorizontal: 10,
-  },
-
-  loopButton: {
-    marginTop: 20,
-    padding: 10,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

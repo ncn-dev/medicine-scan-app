@@ -42,7 +42,7 @@ export default function LoginScreen({ navigation }) {
     // formData.append("password", password);
     try {
       const response = await axios.post(
-        "http://172.20.10.2/api/auth/login",
+        `http://172.20.10.3:3000/api/auth/login`,
         data,
       );
       console.log(response.data)
