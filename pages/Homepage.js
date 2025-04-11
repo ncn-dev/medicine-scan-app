@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   Button,
   StyleSheet,
@@ -7,17 +7,22 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
+  Modal
 } from "react-native";
 import { Image } from "react-native";
 import axios from "axios";
 import { FlatList, TextInput } from "react-native-gesture-handler";
 //import { Item } from "react-native-paper/lib/typescript/components/Drawer/Drawer";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { ReminderContext } from "./ReminderContext";
 
 export default function Homepage({ route, navigation }) {
   const [fullname, setFullname] = useState("Nonpawit");
   const [seach, setseach] = useState("");
   const [data, setData] = useState([]);
+  const { alertData, setAlertData} =  useContext(ReminderContext);
+  const [visible, setVisible] = useState(false);
+  const [pillCount, setPillCount] = useState(0);
 
   const fetchData = async () => {
     try {
@@ -34,6 +39,18 @@ export default function Homepage({ route, navigation }) {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (alertData) {
+      setPillCount(alertData.pills);
+      setVisible(true);
+    }
+  }, [alertData]);
+
+  const closeModal = () => {
+    setVisible(false);
+    setAlertData(null); // reset alert
+  };
 
   const images = [
     { id: 1, uri: require("../assets/image/krung.jpg"), title: "Drug 1" },
@@ -66,6 +83,22 @@ export default function Homepage({ route, navigation }) {
 
   return (
     <View style={{ marginTop: 10, backgroundColor: "#FFFFFF" }}>
+      <Modal visible={visible} transparent={true} animationType="fade">
+        <View style={{
+          flex: 1, justifyContent: 'center', alignItems: 'center',
+          backgroundColor:"#F5F5F5",
+        }}>
+          <View 
+            style={{
+              backgroundColor: 'white', padding: 20, borderRadius: 10,
+              alignItems: 'center', width: '80%'
+          }}>
+              <Text style={{ fontSize: 18, marginBottom: 10 }}>ถึงเวลากินยาแล้ว!</Text>
+              <Text>จำนวน: {pillCount} เม็ด 💊</Text>
+              <Button title="ตกลง" onPress={closeModal} />
+          </View>
+        </View>
+      </Modal>
       <View
         style={{
           position: "absolute",
@@ -367,7 +400,7 @@ export default function Homepage({ route, navigation }) {
         </Text>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate("Chatbot")} // ใส่โค้ด onPress ให้ในตำแหน่งที่ถูกต้อง
+          onPress={() => navigation.navigate("ReminderScreen")} // ใส่โค้ด onPress ให้ในตำแหน่งที่ถูกต้อง
           style={{
             flexDirection: "column", // หากต้องการเพิ่มไอคอนหรือข้อความข้างๆ
             alignItems: "center",
