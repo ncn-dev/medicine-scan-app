@@ -1,12 +1,22 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Text, View, FlatList, TouchableOpacity, Image, Alert } from "react-native";
+import {
+  Text,
+  View,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  Alert,
+  Modal,
+  Pressable,
+} from "react-native";
 import { Swipeable } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
-
+import { useReminderContext } from "./ReminderContext";
 
 export default function MedBag({ navigation }) {
   const [data, setData] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -21,6 +31,7 @@ export default function MedBag({ navigation }) {
   };
   useEffect(() => {
     fetchData();
+    setModalVisible(true);
   }, []);
 
   const isExpired = (expDate) => {
@@ -29,21 +40,23 @@ export default function MedBag({ navigation }) {
     console.log(exp < today);
     return exp < today;
   };
-  
+
   const deleteData = async (id) => {
-    try{
-      const response = await axios.post(`http://172.20.10.3:3000/api/user/deletemedbag/${id}`);
+    try {
+      const response = await axios.post(
+        `http://172.20.10.3:3000/api/user/deletemedbag/${id}`
+      );
       console.log(response.data.message); // ตรวจสอบข้อความตอบกลับ
 
       setData(data.filter((item) => item.id !== id));
-    }catch(error){
+    } catch (error) {
       console.error("เกิดข้อผิดพลาดในการลบ:", error);
       Alert.alert("เกิดข้อผิดพลาด", "ไม่สามารถลบข้อมูลได้");
     }
-  }
- 
+  };
+
   const renderRightActions = (id) => (
-    <TouchableOpacity  
+    <TouchableOpacity
       style={{
         justifyContent: "center",
         alignItems: "center",
@@ -54,17 +67,17 @@ export default function MedBag({ navigation }) {
         marginTop: 10,
       }}
       onPress={() => {
-        Alert.alert("ยืนยันการลบ","คุณต้องการที่จะลบยานี้ใช่หรือไม่",[
+        Alert.alert("ยืนยันการลบ", "คุณต้องการที่จะลบยานี้ใช่หรือไม่", [
           {
-            text: 'ยกเลิก'
+            text: "ยกเลิก",
           },
           {
-            text: 'ยืนยัน',
+            text: "ยืนยัน",
             onPress: () => {
-              deleteData(id)
-            }
+              deleteData(id);
+            },
           },
-        ])
+        ]);
       }}
     >
       <Icon name="delete" size={30} color="#fff" />
@@ -167,6 +180,14 @@ export default function MedBag({ navigation }) {
     );
   };
 
+  const { beforeMealReminder, afterMealReminder, saveReminderSettings } =
+    useReminderContext();
+  const getTextColor = () => {
+    if (beforeMealReminder && afterMealReminder) return "#007BFF"; // น้ำเงิน
+    if (beforeMealReminder || afterMealReminder) return "#4CAF50"; // เขียว
+    return "#000"; // ดำ
+  };
+
   return (
     <View
       style={{
@@ -210,6 +231,122 @@ export default function MedBag({ navigation }) {
       >
         Medicine Bags
       </Text>
+
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              width: 300,
+              backgroundColor: "#fff",
+              borderRadius: 10,
+              padding: 20,
+            }}
+          >
+            <Text
+              style={{ fontSize: 18, fontWeight: "bold", marginBottom: 15 }}
+            >
+              เลือกการแจ้งเตือน 🕐
+            </Text>
+
+            <Pressable
+              style={{ padding: 10 }}
+              onPress={() => {
+                saveReminderSettings(!beforeMealReminder, afterMealReminder);
+              }}
+            >
+              <Text style={{ color: beforeMealReminder ? "#4CAF50" : "#000", fontSize:16 }}>
+                ก่อนอาหาร
+              </Text>
+            </Pressable>
+
+            <Pressable
+              style={{ padding: 10 }}
+              onPress={() => {
+                saveReminderSettings(beforeMealReminder, !afterMealReminder);
+              }}
+            >
+              <Text style={{ color: afterMealReminder ? "#4CAF50" : "#000", fontSize:16 }}>
+                หลังอาหาร
+              </Text>
+            </Pressable>
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "flex-end", // ชิดขวา
+                marginTop: 20,
+              }}
+            >
+              {/* ปุ่มตกลง */}
+              <Pressable
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                  marginRight: 10,
+                  borderRadius: 5,
+                  // ถ้าอยากใส่พื้นหลังนิดนึงให้ดูเด่น
+                }}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={{ color: "#888", fontSize:15  }}>
+                  ตกลง
+                </Text>
+              </Pressable>
+
+              {/* ปุ่มยกเลิก */}
+              <Pressable
+                style={{
+                  paddingVertical: 10,
+                  paddingHorizontal: 20,
+                  borderRadius: 5,
+                 
+                }}
+                onPress={() => setModalVisible(false)}
+              >
+                <Text style={{ color: "#888", fontSize:15  }}>ยกเลิก</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
+      {/*<View style={{ padding: 20, backgroundColor: "#fff", borderRadius: 10, marginBottom: 20 }}>
+        <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>แจ้งเตือนการกินยา</Text>
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+          <CheckBox
+            value={beforeMealReminder}
+            onValueChange={(newValue) =>{
+              console.log("ก่อนอาหาร:", newValue);
+              saveReminderSettings(newValue, afterMealReminder)
+            }}
+          />
+          <Text style={{ marginLeft: 10 }}>ก่อนอาหาร</Text>
+        </View>
+
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
+          <CheckBox
+            value={afterMealReminder}
+            onValueChange={(newValue) =>{
+              console.log("ก่อนอาหาร:", newValue);
+              saveReminderSettings(beforeMealReminder, newValue)
+            }}
+          />
+          <Text style={{ marginLeft: 10 }}>หลังอาหาร</Text>
+        </View>
+      </View>*/}
+
       <FlatList
         data={data}
         keyExtractor={(item) => item.id}

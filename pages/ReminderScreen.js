@@ -17,35 +17,59 @@ const ReminderScreen = () => {
   const { setAlertData } = useContext(ReminderContext);
   const navigation = useNavigation();
 
-  const [schedules, setSchedules] = useState([
+  const [beforeMealSchedules, setBeforeMealSchedules] = useState([
     { hour: 8, minute: 0, pills: 1 },
     { hour: 12, minute: 0, pills: 1 },
-    { hour: 16, minute: 0, pills: 1 },
-    { hour: 20, minute: 0, pills: 1 },
+    { hour: 18, minute: 0, pills: 1 },
+  ]);
+
+  const [afterMealSchedules, setAfterMealSchedules] = useState([
+    { hour: 8, minute: 0, pills: 1 },
+    { hour: 12, minute: 0, pills: 1 },
+    { hour: 18, minute: 0, pills: 1 },
+    
   ]);
 
   const [selectedIndex, setSelectedIndex] = useState(null);
   const [showPicker, setShowPicker] = useState(false);
   const [timesPerDay, setTimesPerDay] = useState(4);
   const [numberOfDays, setNumberOfDays] = useState(7);
+  const [editingType, setEditingType] = useState(null); // 'before' หรือ 'after'
 
   const onTimeChange = (event, selectedDate) => {
     if (selectedDate && selectedIndex !== null) {
       console.log("Selected time:", selectedDate);
-      const updated = [...schedules];
+      const hour = selectedDate.getHours();
+      const updated =
+        editingType === "before"
+          ? [...beforeMealSchedules]
+          : [...afterMealSchedules];
+
       updated[selectedIndex].hour = selectedDate.getHours();
       updated[selectedIndex].minute = selectedDate.getMinutes();
-      setSchedules(updated);
+
+      editingType === "before"
+        ? setBeforeMealSchedules(updated)
+        : setAfterMealSchedules(updated);
     }
     setShowPicker(false);
     setSelectedIndex(null);
+    setEditingType(null);
   };
 
   const handleSave = async () => {
     // เก็บค่าตารางกินยาไว้ใน context
-    await AsyncStorage.setItem("medSchedules", JSON.stringify(schedules));
+    await AsyncStorage.setItem(
+      "beforeMealSchedules",
+      JSON.stringify(beforeMealSchedules)
+    );
+    await AsyncStorage.setItem(
+      "afterMealSchedules",
+      JSON.stringify(afterMealSchedules)
+    );
     setAlertData({
-      schedules: schedules,
+      before: beforeMealSchedules,
+      after: afterMealSchedules,
     });
 
     // แสดง alert แจ้งเตือน
@@ -62,17 +86,21 @@ const ReminderScreen = () => {
     )}:${formattedMinute} ${ampm}`;
   };
 
-  const now = new Date(); // เอาปี เดือน วัน ปัจจุบัน
-  const selectedTime =
-    selectedIndex !== null
-      ? new Date(
-          now.getFullYear(),
-          now.getMonth(),
-          now.getDate(),
-          schedules[selectedIndex].hour,
-          schedules[selectedIndex].minute
-        )
-      : now;
+  const now = new Date();
+  const selectedSchedule =
+    editingType === "before"
+      ? beforeMealSchedules[selectedIndex]
+      : afterMealSchedules[selectedIndex];
+  
+  const selectedTime = selectedSchedule
+    ? new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        selectedSchedule.hour,
+        selectedSchedule.minute
+      )
+    : now;
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -80,7 +108,7 @@ const ReminderScreen = () => {
       const nowHour = now.getHours();
       const nowMinute = now.getMinutes();
 
-      schedules.forEach((schedule) => {
+      [...beforeMealSchedules, ...afterMealSchedules].forEach((schedule) => {
         if (nowHour === schedule.hour && nowMinute === schedule.minute) {
           setAlertData({
             time: `${schedule.hour}:${schedule.minute}`,
@@ -106,7 +134,7 @@ const ReminderScreen = () => {
           }}
         >
           <TouchableOpacity
-            onPress={() => navigation.navigate("MedBag")}
+            onPress={() => navigation.navigate("Homepage")}
             style={{
               width: 40,
               height: 40,
@@ -122,31 +150,36 @@ const ReminderScreen = () => {
         </View>
         <Text style={styles.title}>Reminder</Text>
 
+        {/*กล่องทานยาก่อนอาหาร*/}
         <View style={styles.reminderBox}>
-          <Text style={styles.subTitle}>ตั้งเวลาเตือน</Text>
+          <Text style={styles.subTitle}>ตั้งเวลาเตือน (ก่อนอาหาร)</Text>
           <View style={{ flexDirection: "row", gap: 10 }}>
             <View style={styles.blueBadge}>
               <TouchableOpacity
                 onPress={() => {
                   const newCount =
-                    schedules.length >= 5 ? 1 : schedules.length + 1;
+                    beforeMealSchedules.length >= 5
+                      ? 1
+                      : beforeMealSchedules.length + 1;
                   const defaultTime = { hour: 8, minute: 0, pills: 1 };
                   const newSchedules = Array.from(
                     { length: newCount },
                     (_, i) => {
-                      return schedules[i] || defaultTime;
+                      return beforeMealSchedules[i] || defaultTime;
                     }
                   );
-                  setSchedules(newSchedules);
+                  setBeforeMealSchedules(newSchedules);
                 }}
                 onLongPress={() => {
-                  if (schedules.length > 1) {
-                    setSchedules(schedules.slice(0, schedules.length - 1));
+                  if (beforeMealSchedules.length > 1) {
+                    setSchedules(
+                      beforeMealSchedules.slice(0, beforeMealSchedules.length - 1)
+                    );
                   }
                 }}
               >
                 <Text style={styles.badgeText}>
-                  วันละ {schedules.length} ครั้ง
+                  วันละ {beforeMealSchedules.length} ครั้ง
                 </Text>
               </TouchableOpacity>
             </View>
@@ -171,11 +204,12 @@ const ReminderScreen = () => {
               onChange={onTimeChange}
             />
           )}
-          {schedules.map((item, index) => (
+          {beforeMealSchedules.map((item, index) => (
             <View key={index} style={styles.scheduleRow}>
               <TouchableOpacity
                 onPress={() => {
                   setSelectedIndex(index);
+                  setEditingType("before");
                   setShowPicker(true);
                 }}
               >
@@ -187,7 +221,89 @@ const ReminderScreen = () => {
               <TouchableOpacity
                 onPress={() => {
                   const newPills = item.pills === 100 ? 1 : item.pills + 1;
-                  const updated = [...schedules];
+                  const updated = [...beforeMealSchedules];
+                  updated[index].pills = newPills;
+                  setSchedules(updated);
+                }}
+              >
+                <Text style={styles.pillText}>{item.pills} เม็ด</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+        </View>
+
+        {/*กล่องทานยาหลังอาหาร*/}
+        <View style={styles.reminderBox}>
+          <Text style={styles.subTitle}>ตั้งเวลาเตือน (หลังอาหาร)</Text>
+          <View style={{ flexDirection: "row", gap: 10 }}>
+            <View style={styles.blueBadge}>
+              <TouchableOpacity
+                onPress={() => {
+                  const newCount =
+                    afterMealSchedules.length >= 5
+                      ? 1
+                      : afterMealSchedules.length + 1;
+                  const defaultTime = { hour: 8, minute: 0, pills: 1 };
+                  const newSchedules = Array.from(
+                    { length: newCount },
+                    (_, i) => {
+                      return afterMealSchedules[i] || defaultTime;
+                    }
+                  );
+                  setAfterMealSchedules(newSchedules);
+                }}
+                onLongPress={() => {
+                  if (afterMealSchedules.length > 1) {
+                    setSchedules(
+                      afterMealSchedules.slice(0, afterMealSchedules.length - 1)
+                    );
+                  }
+                }}
+              >
+                <Text style={styles.badgeText}>
+                  วันละ {afterMealSchedules.length} ครั้ง
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.blueBadge}>
+              <TouchableOpacity
+                onPress={() => {
+                  const newDays = numberOfDays >= 14 ? 1 : numberOfDays + 1;
+                  setNumberOfDays(newDays);
+                }}
+              >
+                <Text style={styles.badgeText}>
+                  เป็นเวลา {numberOfDays} วัน
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+          {showPicker && (
+            <DateTimePicker
+              mode="time"
+              value={selectedTime}
+              onChange={onTimeChange}
+            />
+          )}
+          {afterMealSchedules.map((item, index) => (
+            <View key={index} style={styles.scheduleRow}>
+              <TouchableOpacity
+                onPress={() => {
+                  setSelectedIndex(index);
+                  setEditingType("after");
+                  setShowPicker(true);
+                }}
+              >
+                <Text style={styles.timeText}>
+                  {formatTime(item.hour, item.minute)}
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => {
+                  const newPills = item.pills === 100 ? 1 : item.pills + 1;
+                  const updated = [...afterMealSchedules];
                   updated[index].pills = newPills;
                   setSchedules(updated);
                 }}

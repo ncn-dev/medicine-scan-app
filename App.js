@@ -20,68 +20,72 @@ const Stack = createStackNavigator();
 
 export default function App() {
   return (
-    <ReminderProvider>
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="Homepage"
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
-          <Stack.Screen
-            name="Home"
-            component={HomeScreen}
-            options={{ gestureEnabled: false }}
-          />
-          <Stack.Screen
-            name="NextScreen"
-            component={NextScreen}
-            options={{ gestureEnabled: false }}
-          />
-          <Stack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{ gestureEnabled: false }}
-          />
-          <Stack.Screen
-            name="Register"
-            component={RegisterScreen}
-            options={{ gestureEnabled: false }}
-          />
-          <Stack.Screen
-            name="Homepage"
-            component={Homepage}
-            options={{ gestureEnabled: false }}
-          />
-          <Stack.Screen name="InformationScreen" component={InformationSceen} />
-          <Stack.Screen name="SettingPage" component={SettingPage} />
-          <Stack.Screen
-            name="MedBag"
-            component={MedBag}
-            options={{ gestureEnabled: true }}
-          />
-          <Stack.Screen
-            name="Notification"
-            component={Notification}
-            options={{ gestureEnabled: true }}
-          />
-          <Stack.Screen
-            name="PharmacistHomeScreen"
-            component={PharmacistHomeScreen}
-          />
-          <Stack.Screen name="Detail" component={Detail} />
-          <Stack.Screen
-            name="Chatbot"
-            component={Chatbot}
-            options={{ gestureEnabled: true }}
-          />
-          <Stack.Screen
-            name="ReminderScreen"
-            component={ReminderScreen}
-            options={{ gestureEnabled: true }}
-          />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </ReminderProvider>
+      <ReminderProvider>
+        <NavigationContainer>
+          <Stack.Navigator
+            initialRouteName="Homepage"
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen
+              name="Home"
+              component={HomeScreen}
+              options={{ gestureEnabled: false }}
+            />
+            <Stack.Screen
+              name="NextScreen"
+              component={NextScreen}
+              options={{ gestureEnabled: false }}
+            />
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{ gestureEnabled: false }}
+            />
+            <Stack.Screen
+              name="Register"
+              component={RegisterScreen}
+              options={{ gestureEnabled: false }}
+            />
+            <Stack.Screen
+              name="Homepage"
+              component={Homepage}
+              options={{ gestureEnabled: false }}
+            />
+            <Stack.Screen
+              name="InformationScreen"
+              component={InformationSceen}
+            />
+            <Stack.Screen name="SettingPage" component={SettingPage} />
+            <Stack.Screen
+              name="MedBag"
+              component={MedBag}
+              options={{ gestureEnabled: true }}
+            />
+            <Stack.Screen
+              name="Notification"
+              component={Notification}
+              options={{ gestureEnabled: true }}
+            />
+            <Stack.Screen
+              name="PharmacistHomeScreen"
+              component={PharmacistHomeScreen}
+            />
+            <Stack.Screen name="Detail" component={Detail} />
+            <Stack.Screen
+              name="Chatbot"
+              component={Chatbot}
+              options={{ gestureEnabled: true }}
+            />
+            <Stack.Screen
+              name="ReminderScreen"
+              component={ReminderScreen}
+              options={{ gestureEnabled: true }}
+            />
+          </Stack.Navigator>
+        </NavigationContainer>
+      </ReminderProvider>
+    
   );
 }

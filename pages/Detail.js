@@ -51,7 +51,7 @@ export default function Detail({ route, navigation }) {
       .map((item) => `${item.label}: ${editedItem[item.key]}`)
       .join(". ");
   
-    const avgCharsPerSec = 706``; // ประมาณการความเร็วพูด
+    const avgCharsPerSec = 7; // ประมาณการความเร็วพูด
     const estimatedDuration = Math.ceil(combinedText.length / avgCharsPerSec);
     setDuration(estimatedDuration);
   }, [editedItem]);
@@ -257,7 +257,7 @@ export default function Detail({ route, navigation }) {
         </View>
         <Image
           source={{
-            uri: `http://192.168.10.104:3000/api/uploads/${editedItem.imagepath}`,
+            uri: `http://172.20.10.3:3000/api/uploads/${editedItem.imagepath}`,
           }}
           style={{
             width: 270,
