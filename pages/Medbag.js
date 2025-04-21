@@ -257,10 +257,10 @@ export default function MedBag({ navigation }) {
             <Text
               style={{ fontSize: 18, fontWeight: "bold", marginBottom: 15 }}
             >
-              เลือกการแจ้งเตือน 🕐
+              ต้องการตั้งเวลากินยาหรือไม่ 🕐
             </Text>
 
-            <Pressable
+            {/*<Pressable
               style={{ padding: 10 }}
               onPress={() => {
                 saveReminderSettings(!beforeMealReminder, afterMealReminder);
@@ -280,12 +280,12 @@ export default function MedBag({ navigation }) {
               <Text style={{ color: afterMealReminder ? "#4CAF50" : "#000", fontSize:16 }}>
                 หลังอาหาร
               </Text>
-            </Pressable>
+            </Pressable>*/}
 
             <View
               style={{
                 flexDirection: "row",
-                justifyContent: "flex-end", // ชิดขวา
+                justifyContent: "flex-center", // ชิดขวา
                 marginTop: 20,
               }}
             >
@@ -295,12 +295,16 @@ export default function MedBag({ navigation }) {
                   paddingVertical: 10,
                   paddingHorizontal: 20,
                   marginRight: 10,
+                  marginLeft: 10,
                   borderRadius: 5,
                   // ถ้าอยากใส่พื้นหลังนิดนึงให้ดูเด่น
                 }}
-                onPress={() => setModalVisible(false)}
+                onPress={() => {
+                  setModalVisible(false);
+                  navigation.navigate("ReminderScreen")
+                }}
               >
-                <Text style={{ color: "#888", fontSize:15  }}>
+                <Text style={{ color: "#888", fontSize:17 }}>
                   ตกลง
                 </Text>
               </Pressable>
@@ -311,11 +315,12 @@ export default function MedBag({ navigation }) {
                   paddingVertical: 10,
                   paddingHorizontal: 20,
                   borderRadius: 5,
+                  marginLeft: 70
                  
                 }}
                 onPress={() => setModalVisible(false)}
               >
-                <Text style={{ color: "#888", fontSize:15  }}>ยกเลิก</Text>
+                <Text style={{ color: "#888", fontSize:17 }}>ยกเลิก</Text>
               </Pressable>
             </View>
           </View>

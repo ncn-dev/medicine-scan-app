@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
-  Modal
+  Modal,
 } from "react-native";
 import { Image } from "react-native";
 import axios from "axios";
@@ -20,7 +20,7 @@ export default function Homepage({ route, navigation }) {
   const [fullname, setFullname] = useState("Nonpawit");
   const [seach, setseach] = useState("");
   const [data, setData] = useState([]);
-  const { alertData, setAlertData} =  useContext(ReminderContext);
+  const { alertData, setAlertData } = useContext(ReminderContext);
   const [visible, setVisible] = useState(false);
   const [pillCount, setPillCount] = useState(0);
 
@@ -84,18 +84,28 @@ export default function Homepage({ route, navigation }) {
   return (
     <View style={{ marginTop: 10, backgroundColor: "#FFFFFF" }}>
       <Modal visible={visible} transparent={true} animationType="fade">
-        <View style={{
-          flex: 1, justifyContent: 'center', alignItems: 'center',
-          backgroundColor:"#F5F5F5",
-        }}>
-          <View 
+        <View
+          style={{
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#F5F5F5",
+          }}
+        >
+          <View
             style={{
-              backgroundColor: 'white', padding: 20, borderRadius: 10,
-              alignItems: 'center', width: '80%'
-          }}>
-              <Text style={{ fontSize: 18, marginBottom: 10 }}>ถึงเวลากินยาแล้ว!</Text>
-              <Text>จำนวน: {pillCount} เม็ด 💊</Text>
-              <Button title="ตกลง" onPress={closeModal} />
+              backgroundColor: "white",
+              padding: 20,
+              borderRadius: 10,
+              alignItems: "center",
+              width: "80%",
+            }}
+          >
+            <Text style={{ fontSize: 18, marginBottom: 10 }}>
+              ถึงเวลากินยาแล้ว!
+            </Text>
+            <Text>จำนวน: {pillCount} เม็ด 💊</Text>
+            <Button title="ตกลง" onPress={closeModal} />
           </View>
         </View>
       </Modal>
@@ -267,7 +277,7 @@ export default function Homepage({ route, navigation }) {
                     color: expired < 0 ? "#FF0000" : "#000000",
                   }}
                 >
-                 {expired} วัน {expired < 0 ? "❌" : "✅"}
+                  {expired} วัน {expired < 0 ? "❌" : "✅"}
                 </Text>
               </View>
             );
@@ -294,7 +304,13 @@ export default function Homepage({ route, navigation }) {
               Go to my Medicine Bag,
             </Text>
 
-            <TouchableOpacity onPress={() => navigation.navigate("MedBag")}>
+            <TouchableOpacity
+              style={{ zIndex: 100, elevation: 10 }}
+              onPress={() => {
+                console.log("Navigating to MedBag");
+                navigation.navigate("MedBag");
+              }}
+            >
               <Text
                 style={{
                   marginTop: 20,
@@ -343,19 +359,55 @@ export default function Homepage({ route, navigation }) {
           />
         </View>
       </ScrollView>
+
       <View
         style={{
-          position: "fixed", // ติดกับขอบล่างของหน้าจอ
-          bottom: 0,
+          position: "absolute",
+          bottom: 70, // อยู่เหนือ navbar ที่สูง 200px
+          left: 250,
+          right: 0,
+          alignItems: "center", // จัดให้ปุ่มอยู่ตรงกลางจอ
+          zIndex: 999,
+          // ให้ลอยอยู่เหนือทุกอย่าง
+        }}
+      >
+        <TouchableOpacity
+          onPress={() => navigation.navigate("NextScreen")}
+          style={{
+            backgroundColor: "#1E293B",
+            borderRadius: 30,
+            width: 120,
+            height: 50,
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5,
+            gap: 5,
+          }}
+        >
+          <Icon name="fullscreen" size={40} color="#FFFFFF" />
+          <Text style={{ color: "#FFFFFF", marginTop: 1, fontWeight: "bold", fontSize: 16 }}>
+            Scan
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <View
+        style={{
+          position: "absolute",
+          bottom: -50,
           left: 0,
           right: 0,
-          top: -50,
-          width: "100%",
-          height: 200, // ความสูง Navbar
-          flexDirection: "row", // จัดเรียงแนวนอน
-          justifyContent: "space-around", // กระจายไอคอนให้สมดุล
-          alignItems: "center", // จัดให้อยู่กึ่งกลางแนวตั้ง
-          backgroundColor: "#1E293B", // พื้นหลัง Navbar
+          height: 100,
+          backgroundColor: "#1E293B",
+          flexDirection: "row",
+          justifyContent: "space-around",
+          alignItems: "center",
+          zIndex: 1,
         }}
       >
         <TouchableOpacity
@@ -363,7 +415,7 @@ export default function Homepage({ route, navigation }) {
           style={{
             flexDirection: "column", // หากต้องการเพิ่มไอคอนหรือข้อความข้างๆ
             alignItems: "center",
-            marginTop: -130,
+            marginTop: -20,
             marginLeft: 10,
           }}
         >
@@ -378,7 +430,7 @@ export default function Homepage({ route, navigation }) {
           style={{
             flexDirection: "column", // หากต้องการเพิ่มไอคอนหรือข้อความข้างๆ
             alignItems: "center",
-            marginTop: -130,
+            marginTop: -20,
             marginLeft: 20,
           }}
         >
@@ -388,23 +440,27 @@ export default function Homepage({ route, navigation }) {
           </Text>
         </TouchableOpacity>
 
-        <Text
-          style={{
-            color: "#FFFFFF",
-            marginLeft: 30,
-            marginTop: -100,
-            fontSize: 19,
-          }}
-        >
-          Scan
-        </Text>
-
         <TouchableOpacity
           onPress={() => navigation.navigate("ReminderScreen")} // ใส่โค้ด onPress ให้ในตำแหน่งที่ถูกต้อง
           style={{
             flexDirection: "column", // หากต้องการเพิ่มไอคอนหรือข้อความข้างๆ
             alignItems: "center",
-            marginTop: -130,
+            marginTop: -30,
+            marginLeft: 25,
+          }}
+        >
+          <Icon name="schedule" size={40} color="#FFFFFF" />
+          <Text style={{ color: "#FFFFFF", marginLeft: 5, marginTop: 5 }}>
+            Notification
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Chatbot")} // ใส่โค้ด onPress ให้ในตำแหน่งที่ถูกต้อง
+          style={{
+            flexDirection: "column", // หากต้องการเพิ่มไอคอนหรือข้อความข้างๆ
+            alignItems: "center",
+            marginTop: -20,
             marginLeft: 20,
           }}
         >
@@ -419,9 +475,9 @@ export default function Homepage({ route, navigation }) {
           style={{
             flexDirection: "column", // หากต้องการเพิ่มไอคอนหรือข้อความข้างๆ
             alignItems: "center",
-            marginTop: -130,
+            marginTop: -20,
             marginLeft: 20,
-            marginRight: 10,
+            marginRight: 20,
           }}
         >
           <Icon name="logout" size={30} color="#FFFFFF" />
@@ -430,32 +486,28 @@ export default function Homepage({ route, navigation }) {
           </Text>
         </TouchableOpacity>
       </View>
-      <View
+      {/*<View
         style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "#1E293B", // สีพื้นหลังของแถบ
           position: "absolute",
-          bottom: 210,
-          borderRadius: 50, // ติดล่างหน้าจอ
-          height: 70, // ลดขนาดให้พอดีกับการแสดง
-          width: 70, // ขยายเต็มหน้าจอ
-          paddingHorizontal: 20,
-          marginLeft: 160, // เพิ่ม padding ซ้ายขวา
+          bottom: 10,
+          alignSelf: "center",
+          zIndex: 2,
         }}
       >
         <TouchableOpacity
-          onPress={() => navigation.navigate("NextScreen")} // ใส่โค้ด onPress ให้ในตำแหน่งที่ถูกต้อง
+          onPress={() => navigation.navigate("NextScreen")}
           style={{
+            width: 70,
+            height: 70,
+            borderRadius: 35,
+            backgroundColor: "#1E293B",
             justifyContent: "center",
             alignItems: "center",
-            marginLeft: -7,
           }}
         >
-          <Icon name="fullscreen" size={45} color="#FFFFFF" />
+          <Icon name="schedule" size={40} color="#FFFFFF" />
         </TouchableOpacity>
-      </View>
+      </View>*/}
     </View>
   );
 }
