@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -16,13 +16,37 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import axios from "axios";
 import { ActivityIndicator } from "react-native-paper";
 
-
-export default function ChatScreen({ navigation }) {
+export default function ChatScreen({ route, navigation }) {
   const [isUploading, setIsUploading] = useState(false);
+  const [chatHistory, setChatHistory] = useState([]);
+  const { question } = route.params || {};
+  const [suggestedQuestions, setSuggestedQuestions] = useState([]);
+
+  useEffect(() => {
+    if (question) {
+      const formatted = formatQuestion(question);
+      setInput(formatted);
+      // เอาคำถามไปถาม GPT ได้เลย เช่นเรียก API หรือ set ค่าบนหน้าจอ
+      console.log("คำถามที่ส่งมา:", question);
+      // callGPT(question);
+    }
+  }, [question]);
+
+  const formatQuestion = (raw) => {
+    if (raw.startsWith("ชื่อยา:")) {
+      const medName = raw.replace("ชื่อยา:", "").trim();
+      return `${medName} ช่วยในเรื่องใด?`;
+    }
+    return raw;
+  };
+
   const [messages, setMessages] = useState([
     {
-      id: "1", text: "สวัสดีค่ะ อยากสอบถามข้อมูลเกี่ยวกับยาอะไรไหมครับ!", sender: "other", imageUri: null
-    }
+      id: "1",
+      text: "สวัสดีค่ะ อยากสอบถามข้อมูลเกี่ยวกับยาอะไรไหมครับ!",
+      sender: "other",
+      imageUri: null,
+    },
     // { id: "1", text: "สวัสดีครับ!", sender: "other", imageUri: null },
     // { id: "2", text: "มีอะไรให้ช่วยไหมครับ?", sender: "other", imageUri: null },
     // { id: "3", text: "อยากได้ mockup แชทครับ", sender: "me", imageUri: null },
@@ -30,68 +54,169 @@ export default function ChatScreen({ navigation }) {
 
   const [input, setInput] = useState("");
 
-  const sendMessage = async () => {
-    setInput("");
-    if (input.trim() === "") return;
-    setMessages((prevMessages) => [
-        { id: Date.now().toString(), text: input, sender: "me" },
-      ...prevMessages,
-    ]);
-    try{
-    const data = {
-      "text" : input
-    }
-    const response = await axios.post(`http://192.168.10.104:3000/api/chatbot`, data);
-    console.log(response.data.reply_message)
-    
-
-        let replyText = response.data.reply_message;
-        if(!replyText){
-            replyText ="ระบบขัดข้องกรุณาสอบถามใหม่อีกครั้งครับ";
-        }
-
-        setMessages((prevMessages)=>[
-            { id: Date.now().toString(), text: replyText, sender: "other", imageUri:null },
-            ...prevMessages,
-        ]);
-    }catch(error){
-        console.error(err);
-    }
-
-
-    
-
+  const getMedicineName = (raw) => {
+    if (!raw) return "";
+    // ถ้ามาในรูป "พาราเซตามอล ช่วยในเรื่องใด?" ให้ตัดเอาแค่ชื่อยา
+    return raw.replace("ช่วยอะไร?", "").trim();
   };
 
-  const renderMessage = ({ item }) => (
-    <View
-      style={
-        item.sender === "me"
-          ? styles.myMessageContainer
-          : styles.otherMessageContainer
+  const sendMessage = async () => {
+    if (input.trim() === "") return;
+
+    // 1) แสดงข้อความผู้ใช้ก่อน
+    const userMessage = { role: "user", content: input };
+    setMessages((prev) => [
+      { id: Date.now().toString(), text: input, sender: "me" },
+      ...prev,
+    ]);
+    setInput("");
+
+    try {
+      // 2) ส่ง history + userMessage ไปขอคำตอบหลัก
+      const historyToSend = [...chatHistory, userMessage];
+      const response = await axios.post("http://172.20.10.2:3000/api/chatbot", {
+        history: historyToSend,
+      });
+      const replyText = response.data.reply_message;
+
+      // อัปเดต history และแสดงคำตอบหลัก
+      const assistantMessage = { role: "assistant", content: replyText };
+      setChatHistory([...historyToSend, assistantMessage]);
+      setMessages((prev) => [
+        { id: Date.now().toString(), text: replyText, sender: "other" },
+        ...prev,
+      ]);
+
+      // 3) ให้ GPT สร้าง follow-up questions
+      const followUpPrompt = `จากคำตอบนี้:
+  ${replyText}
+  
+  กรุณาสร้างคำถามแนะนำ 3 ข้อเกี่ยวกับยา${getMedicineName(
+    question
+  )} ที่ผู้ใช้สามารถถามต่อได้ (แค่ output เป็น array ของ strings)`;
+      const followUpRes = await axios.post(
+        "http://172.20.10.2:3000/api/chatbot",
+        {
+          history: [
+            ...historyToSend,
+            assistantMessage,
+            { role: "user", content: followUpPrompt },
+          ],
+        }
+      );
+
+      // 4) parse follow-up จาก reply (สมมติเป็น JSON)
+      let followUps = [];
+      try {
+        followUps = JSON.parse(followUpRes.data.reply_message);
+      } catch {
+        // ถ้าไม่เป็น JSON ก็ split ตามบรรทัด
+        followUps = followUpRes.data.reply_message
+          .split("\n")
+          .map((l) => l.replace(/^\d+\.\s*/, "").trim())
+          .filter((l) => l);
       }
-    >
-      {item.imageUri ? (
-        <Image
-          source={{ uri: item.imageUri }}
-          style={{
-            width: 200,
-            height: 150,
-            borderRadius: 10,
-            marginVertical: 5,
-          }}
+
+      setSuggestedQuestions(followUps);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  {
+    /*const sendMessage = async () => {
+    if (input.trim() === "") return;
+
+    const userMessage = { role: "user", content: input };
+
+    // แสดงข้อความผู้ใช้ก่อน
+    setMessages((prevMessages) => [
+      { id: Date.now().toString(), text: input, sender: "me" },
+      ...prevMessages,
+    ]);
+
+    setInput("");
+
+    try {
+      const historyToSend = [...chatHistory, userMessage];
+
+      const response = await axios.post("http://172.20.10.2:3000/api/chatbot", {
+        history: historyToSend, // 👈 ส่งไปด้วย
+      });
+
+      let replyText = response.data.reply_message || "ระบบขัดข้อง กรุณาลองใหม่";
+
+      const medName = getMedicineName(question);
+
+      const followUps = [
+        `ควรทาน ${medName} ปริมาณเท่าไหร่?`,
+        `${medName} มีผลข้างเคียงไหม?`,
+        `สามารถทาน ${medName} ร่วมกับยาอื่นได้ไหม?`,
+      ];
+
+      setSuggestedQuestions(followUps);
+      const assistantMessage = { role: "assistant", content: replyText };
+
+      // เพิ่ม assistant reply เข้า history
+      setChatHistory([...historyToSend, assistantMessage]);
+
+      // แสดงข้อความ bot
+      setMessages((prevMessages) => [
+        {
+          id: Date.now().toString(),
+          text: replyText,
+          sender: "other",
+          imageUri: null,
+        },
+        ...prevMessages,
+      ]);
+    } catch (err) {
+      console.error(err);
+    }
+  };*/
+  }
+
+  const renderMessage = ({ item }) => {
+    const isMe = item.sender === "me";
+  
+    return (
+      <View
+        style={{
+          flexDirection: isMe ? "row-reverse" : "row",
+          alignItems: "flex-start",
+          marginVertical: 5,
+          alignSelf: isMe ? "flex-end" : "flex-start",
+          paddingHorizontal: 10,
+        }}
+      >
+        {/* ไอคอนคนพูด */}
+        <Icon
+          name={isMe ? "person" : "support-agent"}
+          size={24}
+          color={isMe ? "#000000" : "#007AFF"}
+          style={{ marginHorizontal: 8, marginTop: 4 }}
         />
-      ) : (
-        <Text
-          style={
-            item.sender === "me" ? styles.sendmessageText : styles.messageText
-          }
+  
+        {/* Bubble */}
+        <View
+          style={[
+            isMe ? styles.myMessageContainer : styles.otherMessageContainer,
+            { flexShrink: 1 },
+          ]}
         >
-          {item.text}
-        </Text>
-      )}
-    </View>
-  );
+          <Text
+            style={[
+              isMe ? styles.sendmessageText : styles.messageText,
+              { flexShrink: 1 },
+            ]}
+          >
+            {item.text}
+          </Text>
+        </View>
+      </View>
+    );
+  };
+  
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -126,7 +251,7 @@ export default function ChatScreen({ navigation }) {
     });
     try {
       const response = await axios.post(
-        `http://172.20.10.3:3000/api/images/uploads`,
+        `http://172.20.10.2:3000/api/images/uploads`,
         formData,
         {
           headers: {
@@ -135,10 +260,10 @@ export default function ChatScreen({ navigation }) {
         }
       );
       const result = response.data;
-      console.log(result)
+      console.log(result);
       if (response.status) {
         setMessages((prevMessages) => [
-            { id: Date.now().toString(), text: result, sender: "me", imageUri },
+          { id: Date.now().toString(), text: result, sender: "me", imageUri },
           ...prevMessages,
         ]);
       } else {
@@ -189,6 +314,27 @@ export default function ChatScreen({ navigation }) {
         style={{ flex: 1, paddingHorizontal: 10 }}
         inverted
       />
+      {suggestedQuestions.length > 0 && (
+        <View style={{ paddingHorizontal: 15, paddingBottom: 5 }}>
+          <Text style={{ fontWeight: "bold", marginBottom: 5 }}>
+            คำถามแนะนำ:
+          </Text>
+          {suggestedQuestions.map((q, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => setInput(q)}
+              style={{
+                backgroundColor: "#e0f0ff",
+                padding: 10,
+                borderRadius: 10,
+                marginBottom: 5,
+              }}
+            >
+              <Text>{q}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
       <View style={styles.inputContainer}>
         <TouchableOpacity onPress={pickImage} style={{ marginLeft: 10 }}>
           {isUploading ? (
@@ -197,12 +343,14 @@ export default function ChatScreen({ navigation }) {
             <Icon name="image" size={30} color="black" />
           )}
         </TouchableOpacity>
+
         <TextInput
           style={styles.input}
           value={input}
           onChangeText={setInput}
           placeholder="พิมพ์ข้อความ..."
         />
+
         <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
           <Ionicons name="send" size={24} color="black" />
         </TouchableOpacity>
@@ -217,16 +365,14 @@ const styles = StyleSheet.create({
     backgroundColor: "#4682B4",
     padding: 10,
     borderRadius: 10,
-    marginVertical: 5,
-    maxWidth: "70%",
+    maxWidth: "75%",
   },
   otherMessageContainer: {
     alignSelf: "flex-start",
-    backgroundColor: "#ffff",
+    backgroundColor: "#fff",
     padding: 10,
     borderRadius: 10,
-    marginVertical: 5,
-    maxWidth: "70%",
+    maxWidth: "75%",
   },
   messageText: {
     color: "#000000",

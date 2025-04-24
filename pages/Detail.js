@@ -30,9 +30,12 @@ export default function Detail({ route, navigation }) {
   const timerRef = React.useRef(null);
   const progress = useState(new Animated.Value(0))[0];
   const [isPlayingAll, setIsPlayingAll] = useState(false);
+  const [spokenOffset, setSpokenOffset] = useState(0);
 
   const formatTime = (secs) => {
-    const minutes = Math.floor(secs / 60).toString().padStart(2, "0");
+    const minutes = Math.floor(secs / 60)
+      .toString()
+      .padStart(2, "0");
     const seconds = (secs % 60).toString().padStart(2, "0");
     return `${minutes}:${seconds}`;
   };
@@ -46,11 +49,19 @@ export default function Detail({ route, navigation }) {
     { id: 9, key: "usage", label: "วิธีการใช้" },
     { id: 10, key: "effect", label: "ผลข้างเคียง" },
   ];
+
+  const faqQuestions = [
+    `${editedItem.medicinename} ช่วยอะไร?`,
+    `ควรทาน ${editedItem.medicinename} ปริมาณเท่าใด?`,
+    `${editedItem.medicinename} ควรบริโภคยังไง?`,
+    `ผลข้างเคียงของ ${editedItem.medicinename} คืออะไร?`,
+  ];
+
   useEffect(() => {
     const combinedText = detailList
       .map((item) => `${item.label}: ${editedItem[item.key]}`)
       .join(". ");
-  
+
     const avgCharsPerSec = 7; // ประมาณการความเร็วพูด
     const estimatedDuration = Math.ceil(combinedText.length / avgCharsPerSec);
     setDuration(estimatedDuration);
@@ -86,15 +97,20 @@ export default function Detail({ route, navigation }) {
         .map((item) => `${item.label}: ${editedItem[item.key]}`)
         .join(". ");
 
+      const avgCharsPerSec = 7;
+      const charsToSkip = spokenOffset * avgCharsPerSec;
+      const trimmedText = combinedText.slice(charsToSkip);
+
       setSpeakingKey("all");
       setIsPlayingAll(true);
-      setCurrentTime(0);
 
       Animated.timing(progress, {
         toValue: 1,
         duration: duration * 1000,
         useNativeDriver: false,
       }).start();
+
+      setCurrentTime(spokenOffset);
 
       timerRef.current = setInterval(() => {
         setCurrentTime((prev) => {
@@ -106,7 +122,7 @@ export default function Detail({ route, navigation }) {
         });
       }, 1000);
 
-      Speech.speak(combinedText, {
+      Speech.speak(trimmedText, {
         language: "th-TH",
         rate: 1.0,
         pitch: 1.0,
@@ -116,13 +132,13 @@ export default function Detail({ route, navigation }) {
           progress.setValue(0);
           clearInterval(timerRef.current);
           setCurrentTime(0);
+          setSpokenOffset(0);
         },
         onStopped: () => {
           setSpeakingKey(null);
           setIsPlayingAll(false);
           progress.setValue(0);
           clearInterval(timerRef.current);
-          setCurrentTime(0);
         },
       });
     }
@@ -157,7 +173,7 @@ export default function Detail({ route, navigation }) {
     };
     try {
       const response = await axios.post(
-        `http://172.20.10.3:3000/api/user/updatemedbag`,
+        `http://172.20.10.2:3000/api/user/updatemedbag`,
         data
       );
       if (!response.ok) {
@@ -257,7 +273,7 @@ export default function Detail({ route, navigation }) {
         </View>
         <Image
           source={{
-            uri: `http://172.20.10.3:3000/api/uploads/${editedItem.imagepath}`,
+            uri: `http://172.20.10.2:3000/api/uploads/${editedItem.imagepath}`,
           }}
           style={{
             width: 270,
@@ -269,7 +285,36 @@ export default function Detail({ route, navigation }) {
           }}
         />
 
-        {detailList.map((item) => (
+        <View
+          style={{
+            marginTop: 30,
+            backgroundColor: "#EFEFEF",
+            padding: 20,
+            borderRadius: 15,
+          }}
+        >
+          <Text style={{ fontSize: 16, fontWeight: "bold", marginBottom: 10 }}>
+            ❓ คำถามที่พบบ่อยเกี่ยวกับยา
+          </Text>
+          {faqQuestions.map((question, index) => (
+            <TouchableOpacity
+              key={index}
+              style={{
+                backgroundColor: "#FFFFFF",
+                padding: 12,
+                marginVertical: 5,
+                borderRadius: 10,
+                borderWidth: 1,
+                borderColor: "#CCCCCC",
+              }}
+              onPress={() => navigation.navigate("Chatbot", { question })}
+            >
+              <Text style={{ fontSize: 16 }}>{question}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {detailList.map((item, index) => (
           <View
             key={item.id}
             style={{
@@ -305,9 +350,9 @@ export default function Detail({ route, navigation }) {
                 backgroundColor: "#D9D9D9",
                 padding: 10,
                 borderRadius: 10,
-                marginTop: 5,
-                width: "100%",
+                width: "90%",
                 height: 70,
+                justifyContent: "center",
               }}
               onPress={() => {
                 openEditModal(item.key, editedItem[item.key]);
@@ -317,21 +362,44 @@ export default function Detail({ route, navigation }) {
                 {item.label}: {editedItem[item.key]}
               </Text>
             </TouchableOpacity>
+
+            <View style={{ width: 40, alignItems: "center", marginLeft: 5 }}>
+              {index === 0 && (
+                <TouchableOpacity
+                  style={{
+                    marginLeft: 10,
+                  }}
+                  onPress={() => {
+                    const question = `${item.label}:${editedItem[item.key]}`;
+                    navigation.navigate("Chatbot", { question });
+                  }}
+                >
+                  <Icon name="chat" size={30} />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         ))}
 
-        <View 
-          style={{ 
-            marginTop: 40, 
-            alignItems: "center", 
+        <View
+          style={{
+            marginTop: 40,
+            alignItems: "center",
             backgroundColor: "#FDF5E6",
-            borderRadius:20
+            borderRadius: 20,
           }}
         >
-          <Text style={{marginTop:10, fontSize: 16, fontWeight:'bold'}}>🔊 ฟังข้อมูลยาทั้งหมด</Text>
+          <Text style={{ marginTop: 10, fontSize: 16, fontWeight: "bold" }}>
+            🔊 ฟังข้อมูลยาทั้งหมด
+          </Text>
           {/* แถบเวลา */}
           <View
-            style={{ marginTop:10, width: "100%", flexDirection: "row", alignItems: "center" }}
+            style={{
+              marginTop: 10,
+              width: "100%",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
           >
             <Text style={{ fontWeight: "bold", width: 50 }}>
               {formatTime(currentTime)}
@@ -373,7 +441,18 @@ export default function Detail({ route, navigation }) {
               marginTop: 20,
             }}
           >
-            <TouchableOpacity style={{ marginHorizontal: 20 }}>
+            <TouchableOpacity
+              style={{ marginHorizontal: 20 }}
+              onPress={() => {
+                let newOffset = Math.max(0, currentTime - 10);
+                setSpokenOffset(newOffset);
+                if (isPlayingAll) {
+                  speakAllDetails(); // รีพูด
+                } else {
+                  setCurrentTime(newOffset);
+                }
+              }}
+            >
               <Icon name="skip-previous" size={35} color="#0D0D21" />
             </TouchableOpacity>
 
@@ -385,7 +464,18 @@ export default function Detail({ route, navigation }) {
               />
             </TouchableOpacity>
 
-            <TouchableOpacity style={{ marginHorizontal: 20 }}>
+            <TouchableOpacity
+              style={{ marginHorizontal: 20 }}
+              onPress={() => {
+                let newOffset = Math.min(duration, currentTime + 10);
+                setSpokenOffset(newOffset);
+                if (isPlayingAll) {
+                  speakAllDetails(); // รีพูด
+                } else {
+                  setCurrentTime(newOffset);
+                }
+              }}
+            >
               <Icon name="skip-next" size={35} color="#0D0D21" />
             </TouchableOpacity>
           </View>

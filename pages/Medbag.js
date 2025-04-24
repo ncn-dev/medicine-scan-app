@@ -17,13 +17,22 @@ import { useReminderContext } from "./ReminderContext";
 export default function MedBag({ navigation }) {
   const [data, setData] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [prevCount, setPrevCount] = useState();
 
   const fetchData = async () => {
     try {
       const response = await axios.get(
-        `http://172.20.10.3:3000/api/user/medbag/admin`
+        `http://172.20.10.2:3000/api/user/medbag/admin`
       );
-      await setData(response.data);
+      const newData = response.data;
+      
+      if (newData.length > prevCount) {
+        setModalVisible(true);
+      }
+      
+      setData(newData);
+      setPrevCount(newData.length);
+      //await setData(response.data);
       console.log(data);
     } catch (err) {
       console.error(err);
@@ -31,7 +40,7 @@ export default function MedBag({ navigation }) {
   };
   useEffect(() => {
     fetchData();
-    setModalVisible(true);
+    
   }, []);
 
   const isExpired = (expDate) => {
@@ -44,7 +53,7 @@ export default function MedBag({ navigation }) {
   const deleteData = async (id) => {
     try {
       const response = await axios.post(
-        `http://172.20.10.3:3000/api/user/deletemedbag/${id}`
+        `http://172.20.10.2:3000/api/user/deletemedbag/${id}`
       );
       console.log(response.data.message); // ตรวจสอบข้อความตอบกลับ
 
@@ -131,7 +140,7 @@ export default function MedBag({ navigation }) {
           >
             <Image
               source={{
-                uri: `http://172.20.10.3:3000/api/uploads/${imagepath}`,
+                uri: `http://172.20.10.2:3000/api/uploads/${imagepath}`,
               }}
               style={{
                 width: 70,

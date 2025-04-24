@@ -94,7 +94,7 @@ export default function Detail({ route, navigation }) {
     console.log(data);
     try {
       const response = await axios.post(
-        `http://172.20.10.3:3000/api/user/updatemedbag`,
+        `http://172.20.10.2:3000/api/user/updatemedbag`,
         data
       );
       if (!response.ok) {
@@ -144,7 +144,7 @@ export default function Detail({ route, navigation }) {
         </View>
         <Image
           source={{
-            uri: `http://172.20.10.3:3000/api/uploads/${editedItem.imagepath}`,
+            uri: `http://172.20.10.2:3000/api/uploads/${editedItem.imagepath}`,
           }}
           style={{
             width: 270,
