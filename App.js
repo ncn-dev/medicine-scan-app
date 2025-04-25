@@ -10,7 +10,7 @@ import InformationSceen from "./pages/InformationScreen";
 import Homepage from "./pages/Homepage";
 import MedBag from "./pages/Medbag";
 import SettingPage from "./pages/Settingpage";
-import Notification from "./pages/Notification";
+
 import Detail from "./pages/Detail";
 import Chatbot from "./pages/Chatbot";
 import ReminderScreen from "./pages/ReminderScreen";
@@ -57,31 +57,34 @@ export default function App() {
               name="InformationScreen"
               component={InformationSceen}
             />
-            <Stack.Screen name="SettingPage" component={SettingPage} />
+            <Stack.Screen 
+              name="SettingPage" 
+              component={SettingPage} 
+              options={{ gestureEnabled: false }}
+            />
             <Stack.Screen
               name="MedBag"
               component={MedBag}
-              options={{ gestureEnabled: true }}
-            />
-            <Stack.Screen
-              name="Notification"
-              component={Notification}
-              options={{ gestureEnabled: true }}
+              options={{ gestureEnabled: false }}
             />
             <Stack.Screen
               name="PharmacistHomeScreen"
               component={PharmacistHomeScreen}
             />
-            <Stack.Screen name="Detail" component={Detail} />
+            <Stack.Screen 
+              name="Detail" 
+              component={Detail} 
+              options={{ gestureEnabled: false }}
+            />
             <Stack.Screen
               name="Chatbot"
               component={Chatbot}
-              options={{ gestureEnabled: true }}
+              options={{ gestureEnabled: false }}
             />
             <Stack.Screen
               name="ReminderScreen"
               component={ReminderScreen}
-              options={{ gestureEnabled: true }}
+              options={{ gestureEnabled: false }}
             />
           </Stack.Navigator>
         </NavigationContainer>

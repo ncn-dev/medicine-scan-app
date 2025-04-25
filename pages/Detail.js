@@ -40,6 +40,9 @@ export default function Detail({ route, navigation }) {
     return `${minutes}:${seconds}`;
   };
 
+
+  
+
   const detailList = [
     { id: 1, key: "medicinename", label: "ชื่อยา" },
     { id: 2, key: "dose", label: "ปริมาณยา" },
@@ -363,21 +366,7 @@ export default function Detail({ route, navigation }) {
               </Text>
             </TouchableOpacity>
 
-            <View style={{ width: 40, alignItems: "center", marginLeft: 5 }}>
-              {index === 0 && (
-                <TouchableOpacity
-                  style={{
-                    marginLeft: 10,
-                  }}
-                  onPress={() => {
-                    const question = `${item.label}:${editedItem[item.key]}`;
-                    navigation.navigate("Chatbot", { question });
-                  }}
-                >
-                  <Icon name="chat" size={30} />
-                </TouchableOpacity>
-              )}
-            </View>
+            
           </View>
         ))}
 

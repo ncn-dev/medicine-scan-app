@@ -27,7 +27,6 @@ const ReminderScreen = () => {
     { hour: 8, minute: 0, pills: 1 },
     { hour: 12, minute: 0, pills: 1 },
     { hour: 18, minute: 0, pills: 1 },
-    
   ]);
 
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -91,7 +90,7 @@ const ReminderScreen = () => {
     editingType === "before"
       ? beforeMealSchedules[selectedIndex]
       : afterMealSchedules[selectedIndex];
-  
+
   const selectedTime = selectedSchedule
     ? new Date(
         now.getFullYear(),
@@ -173,7 +172,10 @@ const ReminderScreen = () => {
                 onLongPress={() => {
                   if (beforeMealSchedules.length > 1) {
                     setSchedules(
-                      beforeMealSchedules.slice(0, beforeMealSchedules.length - 1)
+                      beforeMealSchedules.slice(
+                        0,
+                        beforeMealSchedules.length - 1
+                      )
                     );
                   }
                 }}
@@ -223,7 +225,13 @@ const ReminderScreen = () => {
                   const newPills = item.pills === 100 ? 1 : item.pills + 1;
                   const updated = [...beforeMealSchedules];
                   updated[index].pills = newPills;
-                  setSchedules(updated);
+                  setBeforeMealSchedules(updated);
+
+                  // ส่งข้อมูล pills ใหม่เข้า context
+                  setAlertData((prev) => ({
+                    ...prev,
+                    pillCount: newPills,
+                  }));
                 }}
               >
                 <Text style={styles.pillText}>{item.pills} เม็ด</Text>
@@ -305,7 +313,13 @@ const ReminderScreen = () => {
                   const newPills = item.pills === 100 ? 1 : item.pills + 1;
                   const updated = [...afterMealSchedules];
                   updated[index].pills = newPills;
-                  setSchedules(updated);
+                  setAfterMealSchedules(updated);
+
+                  // ส่งข้อมูล pills ใหม่เข้า context
+                  setAlertData((prev) => ({
+                    ...prev,
+                    pillCount: newPills,
+                  }));
                 }}
               >
                 <Text style={styles.pillText}>{item.pills} เม็ด</Text>

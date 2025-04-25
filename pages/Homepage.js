@@ -23,6 +23,7 @@ export default function Homepage({ route, navigation }) {
   const { alertData, setAlertData } = useContext(ReminderContext);
   const [visible, setVisible] = useState(false);
   const [pillCount, setPillCount] = useState(0);
+  const [isInitialRender, setIsInitialRender] = useState(true)
 
   const fetchData = async () => {
     try {
@@ -41,11 +42,18 @@ export default function Homepage({ route, navigation }) {
   }, []);
 
   useEffect(() => {
+    if (isInitialRender) {
+      setIsInitialRender(false)
+      return
+    }
+  
+    // จากนี้ไปคือ logic ปกติที่ให้ทำงานตอน alertData เปลี่ยน
     if (alertData) {
       setPillCount(alertData.pills);
-      setVisible(true);
+      setVisible(true)
     }
-  }, [alertData]);
+  }, [alertData])
+  
 
   const closeModal = () => {
     setVisible(false);
@@ -83,6 +91,7 @@ export default function Homepage({ route, navigation }) {
 
   return (
     <View style={{ marginTop: 10, backgroundColor: "#FFFFFF" }}>
+      
       <Modal visible={visible} transparent={true} animationType="fade">
         <View
           style={{
