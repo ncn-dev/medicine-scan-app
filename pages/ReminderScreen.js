@@ -79,7 +79,7 @@ const ReminderScreen = () => {
 
   const handleSave = async () => {
     const now = new Date();
-    
+
     await AsyncStorage.setItem(
       "beforeMealSchedules",
       JSON.stringify(beforeMealSchedules)
@@ -104,24 +104,34 @@ const ReminderScreen = () => {
       "afterNumberOfDays",
       afterNumberOfDays.toString()
     );
-    
+
     setAlertData({
       before: beforeMealSchedules,
       after: afterMealSchedules,
     });
-  
+
     Alert.alert("บันทึกสำเร็จ", "ระบบได้บันทึกเวลาแจ้งเตือนเรียบร้อยแล้ว");
   };
-  
 
   const formatTime = (hour, minute) => {
     const formattedHour = hour % 12 || 12;
     const ampm = hour < 12 ? "AM" : "PM";
     const formattedMinute = String(minute).padStart(2, "0");
+    
+    let period = "";
+    if (hour >= 5 && hour < 11) {
+      period = "เช้า";
+    } else if (hour >= 11 && hour < 16) {
+      period = "กลางวัน";
+    } else if (hour >= 16 && hour < 20) {
+      period = "เย็น";
+    } else {
+      period = "ดึก";
+    }
     return `${String(formattedHour).padStart(
       2,
       "0"
-    )}:${formattedMinute} ${ampm}`;
+    )}:${formattedMinute} ${ampm}         ${period}`;
   };
 
   const now = new Date();
@@ -163,19 +173,23 @@ const ReminderScreen = () => {
     const loadStartDate = async () => {
       const storedStartDate = await AsyncStorage.getItem("startDate");
       const storedNumberOfDays = await AsyncStorage.getItem("numberOfDays");
-      const storedBeforeNumberOfDays = await AsyncStorage.getItem("beforeNumberOfDays");
-      const storedAfterNumberOfDays = await AsyncStorage.getItem("afterNumberOfDays");
-  
+      const storedBeforeNumberOfDays = await AsyncStorage.getItem(
+        "beforeNumberOfDays"
+      );
+      const storedAfterNumberOfDays = await AsyncStorage.getItem(
+        "afterNumberOfDays"
+      );
+
       if (storedStartDate && storedNumberOfDays) {
         const startDate = new Date(storedStartDate);
         const today = new Date();
-  
+
         const timeDiff = today.getTime() - startDate.getTime();
         const daysPassed = Math.floor(timeDiff / (1000 * 3600 * 24));
-  
+
         const originalDays = parseInt(storedNumberOfDays, 10);
         const updatedDays = originalDays - daysPassed;
-  
+
         if (updatedDays <= 0) {
           setNumberOfDays(0);
           setBeforeMealSchedules([]);
@@ -184,20 +198,18 @@ const ReminderScreen = () => {
           setNumberOfDays(updatedDays);
         }
       }
-  
+
       if (storedBeforeNumberOfDays) {
         setBeforeNumberOfDays(parseInt(storedBeforeNumberOfDays, 10));
       }
-  
+
       if (storedAfterNumberOfDays) {
         setAfterNumberOfDays(parseInt(storedAfterNumberOfDays, 10));
       }
     };
-  
+
     loadStartDate();
   }, []);
-  
-  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -251,9 +263,11 @@ const ReminderScreen = () => {
                 onLongPress={() => {
                   if (beforeMealSchedules.length > 1) {
                     setBeforeMealSchedules(
-                      beforeMealSchedules.slice(0, beforeMealSchedules.length - 1)
+                      beforeMealSchedules.slice(
+                        0,
+                        beforeMealSchedules.length - 1
+                      )
                     );
-                    
                   }
                 }}
               >
@@ -266,7 +280,8 @@ const ReminderScreen = () => {
             <View style={styles.blueBadge}>
               <TouchableOpacity
                 onPress={() => {
-                  const newDays = beforeNumberOfDays >= 30 ? 1 : beforeNumberOfDays + 1;
+                  const newDays =
+                    beforeNumberOfDays >= 30 ? 1 : beforeNumberOfDays + 1;
                   setBeforeNumberOfDays(newDays);
                 }}
               >
@@ -354,7 +369,8 @@ const ReminderScreen = () => {
             <View style={styles.blueBadge}>
               <TouchableOpacity
                 onPress={() => {
-                  const newDays = afterNumberOfDays >= 14 ? 1 : afterNumberOfDays + 1;
+                  const newDays =
+                    afterNumberOfDays >= 14 ? 1 : afterNumberOfDays + 1;
                   setAfterNumberOfDays(newDays);
                 }}
               >

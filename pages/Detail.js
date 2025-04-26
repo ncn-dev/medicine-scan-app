@@ -46,11 +46,12 @@ export default function Detail({ route, navigation }) {
   const detailList = [
     { id: 1, key: "medicinename", label: "ชื่อยา" },
     { id: 2, key: "dose", label: "ปริมาณยา" },
-    { id: 5, key: "mfg", label: "วันที่ผลิต" },
-    { id: 6, key: "exp", label: "วันที่หมดอายุ" },
-    { id: 7, key: "warning", label: "คำเตือน" },
-    { id: 9, key: "usage", label: "วิธีการใช้" },
-    { id: 10, key: "effect", label: "ผลข้างเคียง" },
+    { id: 3, key: "mfg", label: "วันที่ผลิต" },
+    { id: 4, key: "exp", label: "วันที่หมดอายุ" },
+    { id: 5, key: "warning", label: "คำเตือน" },
+    { id: 6, key: "usage", label: "วิธีการใช้" },
+    { id: 7, key: "indication", label: "ข้อบ่งใช้"},
+    { id: 8, key: "effect", label: "ผลข้างเคียง" },
   ];
 
   const faqQuestions = [

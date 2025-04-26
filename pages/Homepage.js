@@ -25,6 +25,13 @@ export default function Homepage({ route, navigation }) {
   const [pillCount, setPillCount] = useState(0);
   const [isInitialRender, setIsInitialRender] = useState(true)
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good Morning  ☀️";
+    if (hour < 18) return "Good Afternoon ☀️";
+    return "Good Evening 🌙";
+  };
+
   const fetchData = async () => {
     try {
       const response = await axios.get(
@@ -140,7 +147,7 @@ export default function Homepage({ route, navigation }) {
               paddingHorizontal: 30,
             }}
           >
-            Hi, {fullname}
+            Hi, {getGreeting()}
           </Text>
         </View>
         <View style={{ flex: 1, paddingLeft: 40, paddingRight: 40 }}>
