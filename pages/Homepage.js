@@ -23,7 +23,7 @@ export default function Homepage({ route, navigation }) {
   const { alertData, setAlertData } = useContext(ReminderContext);
   const [visible, setVisible] = useState(false);
   const [pillCount, setPillCount] = useState(0);
-  const [isInitialRender, setIsInitialRender] = useState(true)
+  const [isInitialRender, setIsInitialRender] = useState(true);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -50,17 +50,16 @@ export default function Homepage({ route, navigation }) {
 
   useEffect(() => {
     if (isInitialRender) {
-      setIsInitialRender(false)
-      return
+      setIsInitialRender(false);
+      return;
     }
-  
+
     // จากนี้ไปคือ logic ปกติที่ให้ทำงานตอน alertData เปลี่ยน
     if (alertData) {
       setPillCount(alertData.pills);
-      setVisible(true)
+      setVisible(true);
     }
-  }, [alertData])
-  
+  }, [alertData]);
 
   const closeModal = () => {
     setVisible(false);
@@ -98,14 +97,12 @@ export default function Homepage({ route, navigation }) {
 
   return (
     <View style={{ marginTop: 10, backgroundColor: "#FFFFFF" }}>
-      
       <Modal visible={visible} transparent={true} animationType="fade">
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            
           }}
         >
           <View
@@ -232,72 +229,84 @@ export default function Homepage({ route, navigation }) {
             alignItems: "center", // จัดกล่องให้อยู่กลางในแนวตั้ง
             marginTop: 10,
             paddingHorizontal: 30, // ระยะห่างจากด้านบน
+            minHeight: 155,
           }}
         >
-          {data.map((item) => {
-            console.log(expired);
-            const expired = isExpired(item.exp);
-            return (
-              <View
-                key={item.id} // ใช้ key ที่ไม่ซ้ำกัน (มักจะใช้ ID)
-                style={{
-                  backgroundColor: "#DCDCDC",
-                  padding: 20,
-                  borderRadius: 10,
-                  alignItems: "center",
-                  justifyContent: "center",
-                  minwidth: 150,
-                  maxWidt: 250,
-                  height: "auto",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.2,
-                  shadowRadius: 4,
-                  elevation: 4,
-                  marginTop: 10,
-                  marginLeft: 10,
-                }}
-              >
-                <Text
+          {data.length === 0 ? (
+            <View
+              style={{
+                justifyContent: "center",
+                alignItems: "center",
+                width: "100%",
+              }}
+            >
+            </View>
+          ) : (
+            data.map((item) => {
+              console.log(expired);
+              const expired = isExpired(item.exp);
+              return (
+                <View
+                  key={item.id} // ใช้ key ที่ไม่ซ้ำกัน (มักจะใช้ ID)
                   style={{
-                    fontSize: 20,
-                    fontWeight: "700",
-                    color: "#000",
-                    marginBottom: 5,
-                    textAlign: "center",
-                    flexWrap: "wrap",
+                    backgroundColor: "#DCDCDC",
+                    padding: 20,
+                    borderRadius: 10,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minwidth: 150,
+                    maxWidt: 250,
+                    height: "auto",
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.2,
+                    shadowRadius: 4,
+                    elevation: 4,
+                    marginTop: 10,
+                    marginLeft: 10,
                   }}
-                  numberOfLines={2}
-                  ellipsizeMode="tail"
                 >
-                  {item.medicinename}
-                </Text>
+                  <Text
+                    style={{
+                      fontSize: 20,
+                      fontWeight: "700",
+                      color: "#000",
+                      marginBottom: 5,
+                      textAlign: "center",
+                      flexWrap: "wrap",
+                    }}
+                    numberOfLines={2}
+                    ellipsizeMode="tail"
+                  >
+                    {item.medicinename}
+                  </Text>
 
-                <Text
-                  style={{
-                    fontSize: 15,
-                    color: expired < 0 ? "#FF0000" : "gray",
-                    marginBottom: 20,
-                    fontWeight: "bold",
-                  }}
-                >
-                  {expired < 0
-                    ? "*ยาของคุณหมดอายุแล้ว*"
-                    : "วันที่คงเหลือก่อนยาหมดอายุ"}
-                </Text>
+                  <Text
+                    style={{
+                      fontSize: 15,
+                      color: expired < 0 ? "#FF0000" : "gray",
+                      marginBottom: 20,
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {expired < 0
+                      ? "*ยาของคุณหมดอายุแล้ว*"
+                      : "วันที่คงเหลือก่อนยาหมดอายุ"}
+                  </Text>
 
-                <Text
-                  style={{
-                    fontSize: 25,
-                    fontWeight: "700",
-                    color: expired < 0 ? "#FF0000" : "#000000",
-                  }}
-                >
-                  {expired} วัน {expired < 0 ? "❌" : "✅"}
-                </Text>
-              </View>
-            );
-          })}
+                  <Text
+                    style={{
+                      fontSize: 25,
+                      fontWeight: "700",
+                      color: expired < 0 ? "#FF0000" : "#000000",
+                    }}
+                  >
+                    {expired} วัน {expired < 0 ? "❌" : "✅"}
+                  </Text>
+                </View>
+              );
+            })
+          )}
         </ScrollView>
 
         <View
@@ -406,7 +415,14 @@ export default function Homepage({ route, navigation }) {
           }}
         >
           <Icon name="fullscreen" size={40} color="#FFFFFF" />
-          <Text style={{ color: "#FFFFFF", marginTop: 1, fontWeight: "bold", fontSize: 16 }}>
+          <Text
+            style={{
+              color: "#FFFFFF",
+              marginTop: 1,
+              fontWeight: "bold",
+              fontSize: 16,
+            }}
+          >
             Scan
           </Text>
         </TouchableOpacity>

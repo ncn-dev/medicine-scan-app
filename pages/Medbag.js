@@ -17,7 +17,7 @@ import { useReminderContext } from "./ReminderContext";
 export default function MedBag({ navigation }) {
   const [data, setData] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [prevCount, setPrevCount] = useState();
+  
 
   const fetchData = async () => {
     try {
@@ -26,12 +26,12 @@ export default function MedBag({ navigation }) {
       );
       const newData = response.data;
       
-      if (newData.length > prevCount) {
+      if (newData.length > data.length) {
         setModalVisible(true);
       }
       
       setData(newData);
-      setPrevCount(newData.length);
+      
       //await setData(response.data);
       console.log(data);
     } catch (err) {
