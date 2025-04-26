@@ -98,7 +98,7 @@ export default function Homepage({ route, navigation }) {
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
-            backgroundColor: "#F5F5F5",
+            
           }}
         >
           <View
@@ -107,7 +107,7 @@ export default function Homepage({ route, navigation }) {
               padding: 20,
               borderRadius: 10,
               alignItems: "center",
-              width: "80%",
+              width: "70%",
             }}
           >
             <Text style={{ fontSize: 18, marginBottom: 10 }}>

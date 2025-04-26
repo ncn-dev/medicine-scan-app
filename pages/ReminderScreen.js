@@ -16,6 +16,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const ReminderScreen = () => {
   const { setAlertData } = useContext(ReminderContext);
   const navigation = useNavigation();
+  const [beforeNumberOfDays, setBeforeNumberOfDays] = useState(7);
+  const [afterNumberOfDays, setAfterNumberOfDays] = useState(7);
 
   const [beforeMealSchedules, setBeforeMealSchedules] = useState([
     { hour: 8, minute: 0, pills: 1 },
@@ -56,8 +58,28 @@ const ReminderScreen = () => {
     setEditingType(null);
   };
 
+  // const handleSave = async () => {
+  //   // เก็บค่าตารางกินยาไว้ใน context
+  //   await AsyncStorage.setItem(
+  //     "beforeMealSchedules",
+  //     JSON.stringify(beforeMealSchedules)
+  //   );
+  //   await AsyncStorage.setItem(
+  //     "afterMealSchedules",
+  //     JSON.stringify(afterMealSchedules)
+  //   );
+  //   setAlertData({
+  //     before: beforeMealSchedules,
+  //     after: afterMealSchedules,
+  //   });
+
+  //   // แสดง alert แจ้งเตือน
+  //   Alert.alert("บันทึกสำเร็จ", "ระบบได้บันทึกเวลาแจ้งเตือนเรียบร้อยแล้ว");
+  // };
+
   const handleSave = async () => {
-    // เก็บค่าตารางกินยาไว้ใน context
+    const now = new Date();
+    
     await AsyncStorage.setItem(
       "beforeMealSchedules",
       JSON.stringify(beforeMealSchedules)
@@ -66,14 +88,31 @@ const ReminderScreen = () => {
       "afterMealSchedules",
       JSON.stringify(afterMealSchedules)
     );
+    await AsyncStorage.setItem(
+      "startDate",
+      now.toISOString() // <<== เพิ่มอันนี้
+    );
+    await AsyncStorage.setItem(
+      "numberOfDays",
+      numberOfDays.toString() // <<== เพิ่มอันนี้
+    );
+    await AsyncStorage.setItem(
+      "beforeNumberOfDays",
+      beforeNumberOfDays.toString()
+    );
+    await AsyncStorage.setItem(
+      "afterNumberOfDays",
+      afterNumberOfDays.toString()
+    );
+    
     setAlertData({
       before: beforeMealSchedules,
       after: afterMealSchedules,
     });
-
-    // แสดง alert แจ้งเตือน
+  
     Alert.alert("บันทึกสำเร็จ", "ระบบได้บันทึกเวลาแจ้งเตือนเรียบร้อยแล้ว");
   };
+  
 
   const formatTime = (hour, minute) => {
     const formattedHour = hour % 12 || 12;
@@ -119,6 +158,46 @@ const ReminderScreen = () => {
 
     return () => clearInterval(interval); // ล้าง timer ตอน component unmount
   }, []);
+
+  useEffect(() => {
+    const loadStartDate = async () => {
+      const storedStartDate = await AsyncStorage.getItem("startDate");
+      const storedNumberOfDays = await AsyncStorage.getItem("numberOfDays");
+      const storedBeforeNumberOfDays = await AsyncStorage.getItem("beforeNumberOfDays");
+      const storedAfterNumberOfDays = await AsyncStorage.getItem("afterNumberOfDays");
+  
+      if (storedStartDate && storedNumberOfDays) {
+        const startDate = new Date(storedStartDate);
+        const today = new Date();
+  
+        const timeDiff = today.getTime() - startDate.getTime();
+        const daysPassed = Math.floor(timeDiff / (1000 * 3600 * 24));
+  
+        const originalDays = parseInt(storedNumberOfDays, 10);
+        const updatedDays = originalDays - daysPassed;
+  
+        if (updatedDays <= 0) {
+          setNumberOfDays(0);
+          setBeforeMealSchedules([]);
+          setAfterMealSchedules([]);
+        } else {
+          setNumberOfDays(updatedDays);
+        }
+      }
+  
+      if (storedBeforeNumberOfDays) {
+        setBeforeNumberOfDays(parseInt(storedBeforeNumberOfDays, 10));
+      }
+  
+      if (storedAfterNumberOfDays) {
+        setAfterNumberOfDays(parseInt(storedAfterNumberOfDays, 10));
+      }
+    };
+  
+    loadStartDate();
+  }, []);
+  
+  
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -171,12 +250,10 @@ const ReminderScreen = () => {
                 }}
                 onLongPress={() => {
                   if (beforeMealSchedules.length > 1) {
-                    setSchedules(
-                      beforeMealSchedules.slice(
-                        0,
-                        beforeMealSchedules.length - 1
-                      )
+                    setBeforeMealSchedules(
+                      beforeMealSchedules.slice(0, beforeMealSchedules.length - 1)
                     );
+                    
                   }
                 }}
               >
@@ -189,12 +266,12 @@ const ReminderScreen = () => {
             <View style={styles.blueBadge}>
               <TouchableOpacity
                 onPress={() => {
-                  const newDays = numberOfDays >= 14 ? 1 : numberOfDays + 1;
-                  setNumberOfDays(newDays);
+                  const newDays = beforeNumberOfDays >= 30 ? 1 : beforeNumberOfDays + 1;
+                  setBeforeNumberOfDays(newDays);
                 }}
               >
                 <Text style={styles.badgeText}>
-                  เป็นเวลา {numberOfDays} วัน
+                  เป็นเวลา {beforeNumberOfDays} วัน
                 </Text>
               </TouchableOpacity>
             </View>
@@ -262,7 +339,7 @@ const ReminderScreen = () => {
                 }}
                 onLongPress={() => {
                   if (afterMealSchedules.length > 1) {
-                    setSchedules(
+                    setAfterMealSchedules(
                       afterMealSchedules.slice(0, afterMealSchedules.length - 1)
                     );
                   }
@@ -277,12 +354,12 @@ const ReminderScreen = () => {
             <View style={styles.blueBadge}>
               <TouchableOpacity
                 onPress={() => {
-                  const newDays = numberOfDays >= 14 ? 1 : numberOfDays + 1;
-                  setNumberOfDays(newDays);
+                  const newDays = afterNumberOfDays >= 14 ? 1 : afterNumberOfDays + 1;
+                  setAfterNumberOfDays(newDays);
                 }}
               >
                 <Text style={styles.badgeText}>
-                  เป็นเวลา {numberOfDays} วัน
+                  เป็นเวลา {afterNumberOfDays} วัน
                 </Text>
               </TouchableOpacity>
             </View>
