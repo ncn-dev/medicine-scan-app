@@ -51,7 +51,7 @@ export default function Detail({ route, navigation }) {
     { id: 5, key: "warning", label: "คำเตือน" },
     { id: 6, key: "usage", label: "วิธีการใช้" },
     { id: 7, key: "indication", label: "ข้อบ่งใช้"},
-    { id: 8, key: "effect", label: "ผลข้างเคียง" },
+    
   ];
 
   const faqQuestions = [
