@@ -16,6 +16,7 @@ import axios from "axios";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import * as Speech from "expo-speech";
 import { Animated } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 
 export default function Detail({ route, navigation }) {
   const { item } = route.params;
@@ -31,6 +32,9 @@ export default function Detail({ route, navigation }) {
   const progress = useState(new Animated.Value(0))[0];
   const [isPlayingAll, setIsPlayingAll] = useState(false);
   const [spokenOffset, setSpokenOffset] = useState(0);
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedDateKey, setSelectedDateKey] = useState(null);
 
   const formatTime = (secs) => {
     const minutes = Math.floor(secs / 60)
@@ -40,8 +44,33 @@ export default function Detail({ route, navigation }) {
     return `${minutes}:${seconds}`;
   };
 
-
+  const handleDateChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setDatePickerVisible(false);
+    setSelectedDate(currentDate);
   
+    const dateOnly = currentDate.toLocaleDateString('en-CA'); // ใช้ local แทน
+  
+    if (selectedField === "mfg") {
+      setEditedItem((prev) => ({
+        ...prev,
+        mfg: dateOnly,
+      }));
+    } else if (selectedField === "exp") {
+      setEditedItem((prev) => ({
+        ...prev,
+        exp: dateOnly,
+      }));
+    }
+  };
+  
+  
+
+  const openDatePicker = (key) => {
+    setSelectedField(key); 
+    setSelectedDateKey(key);
+    setDatePickerVisible(true);
+  };
 
   const detailList = [
     { id: 1, key: "medicinename", label: "ชื่อยา" },
@@ -50,8 +79,7 @@ export default function Detail({ route, navigation }) {
     { id: 4, key: "exp", label: "วันที่หมดอายุ" },
     { id: 5, key: "warning", label: "คำเตือน" },
     { id: 6, key: "usage", label: "วิธีการใช้" },
-    { id: 7, key: "indication", label: "ข้อบ่งใช้"},
-    
+    { id: 7, key: "indication", label: "ข้อบ่งใช้" },
   ];
 
   const faqQuestions = [
@@ -211,6 +239,7 @@ export default function Detail({ route, navigation }) {
             justifyContent: "center",
             alignItems: "center",
             backgroundColor: "rgba(0,0,0,0.5)",
+            zIndex: 1,
           }}
         >
           <View
@@ -219,6 +248,7 @@ export default function Detail({ route, navigation }) {
               padding: 20,
               backgroundColor: "white",
               borderRadius: 10,
+              zIndex: 10,
             }}
           >
             <Text style={{ fontSize: 18 }}>แก้ไขข้อมูล</Text>
@@ -317,14 +347,13 @@ export default function Detail({ route, navigation }) {
             </TouchableOpacity>
           ))}
         </View>
-
         {detailList.map((item, index) => (
           <View
             key={item.id}
             style={{
               marginTop: 30,
               flexDirection: "row",
-              alignItems: "center",
+              alignItems: "flex-start",
               justifyContent: "center",
             }}
           >
@@ -337,6 +366,7 @@ export default function Detail({ route, navigation }) {
                 justifyContent: "center",
                 alignItems: "center",
                 marginRight: 10,
+                marginTop: 15,
               }}
               onPress={() =>
                 speakText(item.key, `${item.label}:${editedItem[item.key]}`)
@@ -349,25 +379,65 @@ export default function Detail({ route, navigation }) {
               />
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={{
-                backgroundColor: "#D9D9D9",
-                padding: 10,
-                borderRadius: 10,
-                width: "90%",
-                height: 70,
-                justifyContent: "center",
-              }}
-              onPress={() => {
-                openEditModal(item.key, editedItem[item.key]);
-              }}
-            >
-              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                {item.label}: {editedItem[item.key]}
-              </Text>
-            </TouchableOpacity>
+            <View style={{ flex: 1 }}>
+              <TouchableOpacity
+                style={{
+                  backgroundColor: "#D9D9D9",
+                  padding: 10,
+                  borderRadius: 10,
+                  minHeight: 70,
+                  justifyContent: "center",
+                }}
+                onPress={() => openEditModal(item.key, editedItem[item.key])}
+              >
+                <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                  {item.label}:{" "}
+                  {item.key === "mfg" || item.key === "exp"
+                    ? editedItem[item.key]
+                      ? (console.log(editedItem[item.key]),new Date(editedItem[item.key]).toLocaleDateString('en-GB'))
+                      : "ไม่ระบุ"
+                    : editedItem[item.key]}
+                    
+                </Text>
+              </TouchableOpacity>
 
-            
+              {(item.key === "mfg" || item.key === "exp") && (
+                <>
+                  <TouchableOpacity
+                    onPress={() => openDatePicker(item.key)}
+                    style={{
+                      backgroundColor: "#EFEFEF",
+                      paddingVertical: 5,
+                      paddingHorizontal: 10,
+                      borderRadius: 8,
+                      alignSelf: "flex-start",
+                      marginTop: 10,
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: "black",
+                        fontWeight: "bold",
+                        fontSize: 16,
+                      }}
+                    >
+                      เลือกวันที่
+                    </Text>
+                  </TouchableOpacity>
+
+                  {/* แสดง DatePicker เฉพาะตัวที่กำลังกดเลือกอยู่ */}
+                  {datePickerVisible && selectedDateKey === item.key && (
+                    <DateTimePicker
+                      value={selectedDate}
+                      mode="date"
+                      display="default"
+                      onChange={handleDateChange}
+                      style={{ zIndex: 9999 }}
+                    />
+                  )}
+                </>
+              )}
+            </View>
           </View>
         ))}
 

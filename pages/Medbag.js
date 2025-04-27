@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   Text,
   View,
@@ -14,34 +14,44 @@ import { Swipeable } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useReminderContext } from "./ReminderContext";
 
-export default function MedBag({ navigation }) {
+export default function MedBag({ navigation, route }) {
   const [data, setData] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const prevDataLength = useRef(0);
+  const isFirstLoad = useRef(true);
   
 
-  const fetchData = async () => {
+  const fetchData = async (uploaded = false) => {
     try {
       const response = await axios.get(
         `http://172.20.10.2:3000/api/user/medbag/admin`
       );
       const newData = response.data;
-      
-      if (newData.length > data.length) {
+  
+      if (uploaded) {
+        console.log("Modal เปิดเพราะอัปโหลดเสร็จ");
         setModalVisible(true);
       }
+  
+      setData(newData); // ตั้งค่าใหม่ให้กับ data
+      prevDataLength.current = newData.length;
       
-      setData(newData);
-      
-      //await setData(response.data);
-      console.log(data);
+      console.log(newData); // แสดงข้อมูลที่ได้จากการดึงข้อมูล
     } catch (err) {
       console.error(err);
     }
   };
+
   useEffect(() => {
-    fetchData();
-    
-  }, []);
+    // ตรวจสอบว่า params มีค่า `uploaded` หรือไม่
+    if (route.params?.uploaded) {
+      console.log("Modal เปิดเพราะอัปโหลดเสร็จ");
+      setModalVisible(true); // เปิด Modal
+      navigation.setParams({ uploaded: false }); // รีเซ็ตค่า uploaded หลังจากเปิด Modal
+    } else {
+      fetchData(false); // ถ้าไม่มีการอัปโหลด ให้โหลดข้อมูล
+    }
+  }, [route.params, navigation]);
 
   const isExpired = (expDate) => {
     const today = new Date();

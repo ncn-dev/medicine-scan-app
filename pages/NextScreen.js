@@ -84,8 +84,8 @@ export default function NextScreen({ navigation }) {
         }
       );
       alert("Image uploaded successfully.");
-      navigation.navigate("MedBag");
-
+      navigation.navigate("MedBag",{uploaded: true});
+      
     } catch (error) {
       console.error("error uoloading image:", error);
       alert("Failed to uplad image or fetch OCR data");
