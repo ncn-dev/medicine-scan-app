@@ -15,9 +15,9 @@ import { FlatList, TextInput } from "react-native-gesture-handler";
 //import { Item } from "react-native-paper/lib/typescript/components/Drawer/Drawer";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { ReminderContext } from "./ReminderContext";
-
+import { getData } from "../utils/getUserAccount";
+import { SafeAreaView } from 'react-native';
 export default function Homepage({ route, navigation }) {
-  const [fullname, setFullname] = useState("Nonpawit");
   const [seach, setseach] = useState("");
   const [data, setData] = useState([]);
   const { alertData, setAlertData } = useContext(ReminderContext);
@@ -34,8 +34,14 @@ export default function Homepage({ route, navigation }) {
 
   const fetchData = async () => {
     try {
+      const username = await getData();
+      await console.log(username);
+      if(!username){
+        navigation.navigate("Home")
+        
+      }
       const response = await axios.get(
-        `http://172.20.10.2:3000/api/user/medbag/admin`
+        `http://172.20.10.3:3000/api/user/medbag/${username}`
       );
       await setData(response.data);
       console.log(data);
@@ -46,6 +52,7 @@ export default function Homepage({ route, navigation }) {
 
   useEffect(() => {
     fetchData();
+    
   }, []);
 
   useEffect(() => {
@@ -87,11 +94,15 @@ export default function Homepage({ route, navigation }) {
   const imageSize = Dimensions.get("window").width * 0.8;
 
   const isExpired = (expDate) => {
+    console.log('EXP DATE', expDate)
+    if(expDate === null){
+      return true;
+    }
     const today = new Date();
     const exp = new Date(expDate);
     const diffTime = exp - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    //console.log(diffDays);
+    console.log(diffDays);
     return diffDays;
   };
 
@@ -147,7 +158,7 @@ export default function Homepage({ route, navigation }) {
             Hi, {getGreeting()}
           </Text>
         </View>
-        <View style={{ flex: 1, paddingLeft: 40, paddingRight: 40 }}>
+        {/* <View style={{ flex: 1, paddingLeft: 40, paddingRight: 40 }}>
           <TextInput
             style={{
               height: 50,
@@ -173,7 +184,7 @@ export default function Homepage({ route, navigation }) {
           >
             <Icon name="search" size={30} color="#666" />
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
 
       <ScrollView
@@ -245,6 +256,7 @@ export default function Homepage({ route, navigation }) {
             data.map((item) => {
               console.log(expired);
               const expired = isExpired(item.exp);
+              console.log('Nonpawit', typeof expired);
               return (
                 <View
                   key={item.id} // ใช้ key ที่ไม่ซ้ำกัน (มักจะใช้ ID)
@@ -284,24 +296,26 @@ export default function Homepage({ route, navigation }) {
                   <Text
                     style={{
                       fontSize: 15,
-                      color: expired < 0 ? "#FF0000" : "gray",
-                      marginBottom: 20,
+                      color: expired < 0 ? "#e60000" : "gray",
+                      marginBottom: 10,
                       fontWeight: "bold",
                     }}
                   >
-                    {expired < 0
-                      ? "*ยาของคุณหมดอายุแล้ว*"
-                      : "วันที่คงเหลือก่อนยาหมดอายุ"}
+                      {
+                        expired === true ? "ท่านยังไม่ได้ตั้งวันหมดอายุของยา" : expired < 0 ? "ยาหมดอายุแล้ว" : "กำลังจะหมดอายุภายใน"
+                      }
                   </Text>
 
                   <Text
                     style={{
                       fontSize: 25,
                       fontWeight: "700",
-                      color: expired < 0 ? "#FF0000" : "#000000",
+                      color: expired < 0 ? "#e60000" : "#000000",
                     }}
                   >
-                    {expired} วัน {expired < 0 ? "❌" : "✅"}
+                    { 
+                      expired === true ? "" : expired < 0 ? 'อันตรายถึงชีวิต' : `${expired} วัน`
+                    }
                   </Text>
                 </View>
               );
@@ -431,10 +445,10 @@ export default function Homepage({ route, navigation }) {
       <View
         style={{
           position: "absolute",
-          bottom: -50,
+          bottom: -80,
           left: 0,
           right: 0,
-          height: 100,
+          height: 120,
           backgroundColor: "#1E293B",
           flexDirection: "row",
           justifyContent: "space-around",

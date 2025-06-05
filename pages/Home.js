@@ -54,8 +54,7 @@ export default function HomeScreen({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        <View style={{ marginTop: 20, textAlign: "left", marginLeft: 80 }}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+        {/* <View style={{ marginTop: 20, textAlign: "left", marginLeft: 80, flexDirection: "row", alignItems: "center" }}>
             <Text style={{ fontSize: 16 }}>If you are a pharmacist, </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate("PharmacistHomeScreen")}
@@ -72,8 +71,7 @@ export default function HomeScreen({ navigation }) {
                 Click me
               </Text>
             </TouchableOpacity>
-          </View>
-        </View>
+        </View> */}
       </View>
     </View>
   );

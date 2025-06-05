@@ -16,6 +16,7 @@ import { Checkbox } from "expo-checkbox";
 //import Icon from "react-native-vector-icons/MaterialIcons";
 import Icon from 'react-native-vector-icons/FontAwesome';
 
+import { storeData } from "../utils/getUserAccount";
 const logo = require("../assets/image/1.png");
 const logo4 = require("../assets/image/4.png");
 
@@ -27,6 +28,9 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState("");
   const [isChecked, setChecked] = useState(false);
   const [isPasswordVisible,setIsPasswordVisible] = useState(false);
+
+
+
 
   const fetchingData = async () => {
     if (!username || !password) {
@@ -42,11 +46,11 @@ export default function LoginScreen({ navigation }) {
     // formData.append("password", password);
     try {
       const response = await axios.post(
-        `http://172.20.10.2:3000/api/auth/login`,
+        `http://172.20.10.3:3000/api/auth/login`,
         data,
       );
-      console.log(response.data)
       if (!response.ok) {
+        storeData(response.data.idcard);
         navigation.navigate("Homepage", {username : username});
       } else {
         alert("Login Failed, Please Trying Again.");
@@ -136,6 +140,7 @@ export default function LoginScreen({ navigation }) {
                 right:70,
                 top:"33%",
                 transform: [{ translateY: -10 }], 
+                marginTop: 10
               }}
               onPress={() => setIsPasswordVisible(!isPasswordVisible)}
             >
@@ -153,13 +158,13 @@ export default function LoginScreen({ navigation }) {
                 marginVertical: 10,
               }}
             >
-              <Checkbox
+              {/* <Checkbox
                 style={{ margin: 10 }}
                 value={isChecked}
                 onValueChange={setChecked}
                 color={isChecked ? "#18253B" : undefined}
               />
-              <Text>Remember Me</Text>
+              <Text>Remember Me</Text> */}
             </View>
             <TouchableOpacity
               style={{

@@ -39,6 +39,7 @@ export default function Detail({ route, navigation }) {
   const [selectedDateKey, setSelectedDateKey] = useState(null);
   const [liked, setLiked] = useState(false);
   const [unLike, setUnLike] = useState(false);
+  const [rating, setRating] = useState(item.rating);
 
   useEffect(() => {
     const loadPreferences = async () => {
@@ -54,29 +55,38 @@ export default function Detail({ route, navigation }) {
     loadPreferences();
   }, [item.id]);
 
+  useEffect(() => {
+    console.log('Nonpawit Silabumrungrad: ', rating)
+  }, [])
+
   const toggleLike = async () => {
-    const newLiked = !liked;
-    setLiked(newLiked);
-    // setUnLike (!unLike);
-    if (newLiked) setUnLike(false);
-    try {
-      await AsyncStorage.setItem(`liked_${item.id}`, JSON.stringify(newLiked));
-      await AsyncStorage.setItem(`unLiked_${item.id}`, JSON.stringify(false));
-    } catch (error) {
-      console.log("Error saving liked status", err);
-    }
+    setRating(true);
+    console.log('Nonpawit Silabumrungrad : Toggle Like')
+
+    // const newLiked = !liked;
+    // setLiked(newLiked);
+    // // setUnLike (!unLike);
+    // if (newLiked) setUnLike(false);
+    // try {
+    //   await AsyncStorage.setItem(`liked_${item.id}`, JSON.stringify(newLiked));
+    //   await AsyncStorage.setItem(`unLiked_${item.id}`, JSON.stringify(false));
+    // } catch (error) {
+    //   console.log("Error saving liked status", err);
+    // }
   };
 
   const toggleUnLike = async () => {
-    const newUnLiked = !unLike;
-    setUnLike(newUnLiked);
-    if (newUnLiked) setLiked(false);
-    try {
-      await AsyncStorage.setItem(`unLiked_${item.id}`,JSON.stringify(newUnLiked));
-      await AsyncStorage.setItem(`liked_${item.id}`, JSON.stringify(false));
-    } catch (error) {
-      console.log("Error saving unliked status", err);
-    }
+    setRating(false);
+    console.log('Nonpawit Silabumrungrad : Toggle UnLike')
+    // const newUnLiked = !unLike;
+    // setUnLike(newUnLiked);
+    // if (newUnLiked) setLiked(false);
+    // try {
+    //   await AsyncStorage.setItem(`unLiked_${item.id}`,JSON.stringify(newUnLiked));
+    //   await AsyncStorage.setItem(`liked_${item.id}`, JSON.stringify(false));
+    // } catch (error) {
+    //   console.log("Error saving unliked status", err);
+    // }
   };
 
     const formatTime = (secs) => {
@@ -116,7 +126,7 @@ export default function Detail({ route, navigation }) {
     const detailList = [
       { id: 1, key: "medicinename", label: "ชื่อยา" },
       { id: 2, key: "dose", label: "ปริมาณยา" },
-      { id: 3, key: "mfg", label: "วันที่ผลิต" },
+      // { id: 3, key: "mfg", label: "วันที่ผลิต" },
       { id: 4, key: "exp", label: "วันที่หมดอายุ" },
       { id: 5, key: "warning", label: "คำเตือน" },
       { id: 6, key: "usage", label: "วิธีการใช้" },
@@ -237,16 +247,17 @@ export default function Detail({ route, navigation }) {
         dose: editedItem.dose,
         form: editedItem.form,
         registrationnumber: editedItem.registrationnumber,
-        mfg: editedItem.mfg,
+        // mfg: editedItem.mfg,
         exp: editedItem.exp,
         warning: editedItem.warning,
         indication: editedItem.indication,
         usage: editedItem.usage,
-        effect: editedItem.effect,
+        rating: rating,
       };
       try {
+        console.log('Nonpawit Silabumrungrad : ', data)
         const response = await axios.post(
-          `http://172.20.10.2:3000/api/user/updatemedbag`,
+          `http://172.20.10.3:3000/api/user/updatemedbag`,
           data
         );
         if (!response.ok) {
@@ -348,7 +359,7 @@ export default function Detail({ route, navigation }) {
           </View>
           <Image
             source={{
-              uri: `http://172.20.10.2:3000/api/uploads/${editedItem.imagepath}`,
+              uri: `http://172.20.10.3:3000/api/uploads/${editedItem.imagepath}`,
             }}
             style={{
               width: 270,
@@ -435,7 +446,7 @@ export default function Detail({ route, navigation }) {
                 >
                   <Text style={{ fontSize: 18, fontWeight: "bold" }}>
                     {item.label}:{" "}
-                    {item.key === "mfg" || item.key === "exp"
+                    {item.key === "exp"
                       ? editedItem[item.key]
                         ? (console.log(editedItem[item.key]),
                           new Date(editedItem[item.key]).toLocaleDateString(
@@ -446,7 +457,7 @@ export default function Detail({ route, navigation }) {
                   </Text>
                 </TouchableOpacity>
 
-                {(item.key === "mfg" || item.key === "exp") && (
+                {(item.key === "exp") && (
                   <>
                     <TouchableOpacity
                       onPress={() => openDatePicker(item.key)}
@@ -516,7 +527,7 @@ export default function Detail({ route, navigation }) {
                 <Icon
                   name={"thumb-up"}
                   size={35}
-                  color={liked ? "blue" : "gray"}
+                  color={rating === true ? "blue" : "gray"}
                 />
                 <Text style={{ marginTop: 5, marginLeft: 5 }}>like</Text>
               </TouchableOpacity>
@@ -525,7 +536,7 @@ export default function Detail({ route, navigation }) {
                 <Icon
                   name="thumb-down"
                   size={35}
-                  color={unLike ? "blue" : "gray"}
+                  color={rating === false ? "blue" : "gray"}
                 />
                 <Text style={{ marginTop: 5, marginLeft: 5 }}>Unlike</Text>
               </TouchableOpacity>

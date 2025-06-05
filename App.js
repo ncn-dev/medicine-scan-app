@@ -3,7 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import HomeScreen from "./pages/Home";
 import NextScreen from "./pages/NextScreen";
-import PharmacistHomeScreen from "./pages/Pharamacist";
+// import PharmacistHomeScreen from "./pages/Pharamacist";
 import LoginScreen from "./pages/LoginScreen";
 import RegisterScreen from "./pages/RegisterScreen";
 import InformationSceen from "./pages/InformationScreen";
@@ -23,7 +23,7 @@ export default function App() {
       <ReminderProvider>
         <NavigationContainer>
           <Stack.Navigator
-            initialRouteName="Homepage"
+            initialRouteName="Home"
             screenOptions={{
               headerShown: false,
             }}
@@ -66,10 +66,6 @@ export default function App() {
               name="MedBag"
               component={MedBag}
               options={{ gestureEnabled: false }}
-            />
-            <Stack.Screen
-              name="PharmacistHomeScreen"
-              component={PharmacistHomeScreen}
             />
             <Stack.Screen 
               name="Detail" 

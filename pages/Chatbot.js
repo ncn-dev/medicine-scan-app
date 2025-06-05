@@ -74,7 +74,7 @@ export default function ChatScreen({ route, navigation }) {
     try {
       // 2) ส่ง history + userMessage ไปขอคำตอบหลัก
       const historyToSend = [...chatHistory, userMessage];
-      const response = await axios.post("http://172.20.10.2:3000/api/chatbot", {
+      const response = await axios.post("http://172.20.10.3:3000/api/chatbot", {
         history: historyToSend,
       });
       const replyText = response.data.reply_message;
@@ -89,13 +89,15 @@ export default function ChatScreen({ route, navigation }) {
 
       // 3) ให้ GPT สร้าง follow-up questions
       const followUpPrompt = `จากคำตอบนี้:
-  ${replyText}
-  
-  กรุณาสร้างคำถามแนะนำ 3 ข้อเกี่ยวกับยา${getMedicineName(
-    question
-  )} ที่ผู้ใช้สามารถถามต่อได้ (แค่ output เป็น array ของ strings)`;
+        ${replyText}
+
+        ช่วยสร้างคำถามต่อยอด 3 ข้อ ที่เกี่ยวข้องกับยา "${getMedicineName(
+        question
+      )}" โดยคำถามควรเกี่ยวข้องกับสิ่งที่ผู้ใช้มักสงสัย เช่น วิธีใช้, ผลข้างเคียง, ข้อควรระวัง ฯลฯ
+
+      **ให้ออกมาเป็น array ของ string ภาษาไทย เท่านั้น**`;
       const followUpRes = await axios.post(
-        "http://172.20.10.2:3000/api/chatbot",
+        "http://172.20.10.3:3000/api/chatbot",
         {
           history: [
             ...historyToSend,
@@ -178,7 +180,7 @@ export default function ChatScreen({ route, navigation }) {
 
   const renderMessage = ({ item }) => {
     const isMe = item.sender === "me";
-  
+
     return (
       <View
         style={{
@@ -196,7 +198,7 @@ export default function ChatScreen({ route, navigation }) {
           color={isMe ? "#000000" : "#007AFF"}
           style={{ marginHorizontal: 8, marginTop: 4 }}
         />
-  
+
         {/* Bubble */}
         <View
           style={[
@@ -216,7 +218,6 @@ export default function ChatScreen({ route, navigation }) {
       </View>
     );
   };
-  
 
   const pickImage = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -251,7 +252,7 @@ export default function ChatScreen({ route, navigation }) {
     });
     try {
       const response = await axios.post(
-        `http://172.20.10.2:3000/api/images/uploads`,
+        `http://172.20.10.3:3000/api/images/uploads`,
         formData,
         {
           headers: {

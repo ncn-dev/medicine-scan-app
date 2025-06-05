@@ -13,6 +13,7 @@ import {
 import { Swipeable } from "react-native-gesture-handler";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { useReminderContext } from "./ReminderContext";
+import { getData } from "../utils/getUserAccount";
 
 export default function MedBag({ navigation, route }) {
   const [data, setData] = useState([]);
@@ -23,8 +24,9 @@ export default function MedBag({ navigation, route }) {
 
   const fetchData = async (uploaded = false) => {
     try {
+      const username = await getData();
       const response = await axios.get(
-        `http://172.20.10.2:3000/api/user/medbag/admin`
+        `http://172.20.10.3:3000/api/user/medbag/${username}`
       );
       const newData = response.data;
   
@@ -54,6 +56,9 @@ export default function MedBag({ navigation, route }) {
   }, [route.params, navigation]);
 
   const isExpired = (expDate) => {
+    if(expDate === null){
+      return false;
+    }
     const today = new Date();
     const exp = new Date(expDate);
     console.log(exp < today);
@@ -63,7 +68,7 @@ export default function MedBag({ navigation, route }) {
   const deleteData = async (id) => {
     try {
       const response = await axios.post(
-        `http://172.20.10.2:3000/api/user/deletemedbag/${id}`
+        `http://172.20.10.3:3000/api/user/deletemedbag/${id}`
       );
       console.log(response.data.message); // ตรวจสอบข้อความตอบกลับ
 
@@ -104,100 +109,66 @@ export default function MedBag({ navigation, route }) {
   );
 
   const Card = ({ name, dose, date, item, imagepath }) => {
-    const expired = isExpired(item.exp);
-    return (
-      <Swipeable renderRightActions={() => renderRightActions(item.id)}>
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Detail", { item: item })}
+  const expired = isExpired(item.exp);
+  return (
+    <Swipeable renderRightActions={() => renderRightActions(item.id)}>
+      <TouchableOpacity
+        onPress={() => {
+          console.log("ดูรายละเอียด", item);
+          navigation.navigate("Detail", { item: item });
+        }}
+        style={{
+          borderRadius: 10,
+          overflow: "hidden",
+          marginVertical: 10,
+          backgroundColor: "#fff",
+          elevation: 5,
+        }}
+      >
+        {/* ส่วนบน */}
+        <View
           style={{
-            height: 170, // ความสูงการ์ดรวม
-            borderRadius: 10,
-            marginVertical: 10,
-            overflow: "hidden", // ป้องกันสีล้นออกนอกการ์ด
-            elevation: 5,
-            // shadowColor: "#000",
-            // shadowOffset: { width: 0, height: 2 },
-            // shadowOpacity: 0.2,
-            // shadowRadius: 5,
+            backgroundColor: expired ? "#e60000" : "#077d23",
+            padding: 10,
+            alignItems: "center",
           }}
         >
-          {/* ส่วนบนของการ์ด */}
-          <View
-            style={{
-              flex: 0.3, // ส่วนบนจะ占พื้นที่ 60% ของการ์ด
-              backgroundColor: expired ? "#FF0000" : "#4682B4", // สีส่วนบน
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text
-              style={{
-                color: "Black",
-                fontSize: 18,
-              }}
-            >
-              {expired ? "*ยาของท่านหมดอายุแล้ว" : ""}
-            </Text>
-          </View>
-          {/* ส่วนล่างของการ์ด */}
-          <View
-            style={{
-              flex: 0.5, // ส่วนล่างจะ占พื้นที่ 40% ของการ์ด
-              backgroundColor: "#DCDCDC", // สีส่วนล่าง
-              justifyContent: "center",
-              alignItems: "flex-start",
-            }}
-          >
-            <Image
-              source={{
-                uri: `http://172.20.10.2:3000/api/uploads/${imagepath}`,
-              }}
-              style={{
-                width: 70,
-                height: 70,
-                borderRadius: 8,
-                marginRight: 10,
-                marginTop: -1,
-                marginLeft: 10,
-              }}
-            />
-          </View>
+          <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
+            {expired ? "หมดอายุแล้ว โปรดนำไปทิ้งโดยด่วน" : ""}
+          </Text>
+        </View>
 
-          <Text
-            style={{
-              fontSize: 14,
-              fontWeight: "bold",
-              color: "#333",
-              marginLeft: 90,
-              marginTop: -80,
+        {/* ส่วนล่าง */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: "#DCDCDC",
+            padding: 10,
+          }}
+        >
+          <Image
+            source={{
+              uri: `http://172.20.10.3:3000/api/uploads/${imagepath}`,
             }}
-          >
-            {name}
-          </Text>
-          <Text
             style={{
-              fontSize: 14,
-              color: "#555",
-              marginLeft: 90,
-              marginTop: 10,
+              width: 70,
+              height: 70,
+              borderRadius: 8,
+              marginRight: 10,
             }}
-          >
-            {dose}
-          </Text>
-          <Text
-            style={{
-              fontSize: 14,
-              color: "#555",
-              marginLeft: 90,
-              marginTop: 10,
-            }}
-          >
-            {date}
-          </Text>
-        </TouchableOpacity>
-      </Swipeable>
-    );
-  };
+          />
+          <View>
+            <Text style={{ fontWeight: "bold", fontSize: 14 }}>{name}</Text>
+            <Text style={{ color: "#555", marginTop: 5 }}>{dose}</Text>
+            <Text style={{ color: "#555", marginTop: 5 }}>{date}</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    </Swipeable>
+  );
+};
+
 
   const { beforeMealReminder, afterMealReminder, saveReminderSettings } =
     useReminderContext();
@@ -274,7 +245,7 @@ export default function MedBag({ navigation, route }) {
             }}
           >
             <Text
-              style={{ fontSize: 18, fontWeight: "bold", marginBottom: 15 }}
+              style={{ fontSize: 18, fontWeight: "bold", marginBottom: 0, textAlign: 'center' }}
             >
               ต้องการตั้งเวลากินยาหรือไม่ 🕐
             </Text>
@@ -316,14 +287,13 @@ export default function MedBag({ navigation, route }) {
                   marginRight: 10,
                   marginLeft: 10,
                   borderRadius: 5,
-                  // ถ้าอยากใส่พื้นหลังนิดนึงให้ดูเด่น
                 }}
                 onPress={() => {
                   setModalVisible(false);
                   navigation.navigate("ReminderScreen")
                 }}
               >
-                <Text style={{ color: "#888", fontSize:17 }}>
+                <Text style={{ color: "#0022e6", fontSize:17 }}>
                   ตกลง
                 </Text>
               </Pressable>
@@ -339,7 +309,7 @@ export default function MedBag({ navigation, route }) {
                 }}
                 onPress={() => setModalVisible(false)}
               >
-                <Text style={{ color: "#888", fontSize:17 }}>ยกเลิก</Text>
+                <Text style={{ color: "#e60000", fontSize:17 }}>ยกเลิก</Text>
               </Pressable>
             </View>
           </View>
@@ -378,7 +348,7 @@ export default function MedBag({ navigation, route }) {
           <Card
             name={`ชื่อยา : ${item.medicinename}`}
             dose={`ขนาดยา : ${item.dose}`}
-            date={`MFG : ${item.mfg}, EXP : ${item.exp}`}
+            date={`EXP : ${item.exp == null ? 'ยังไม่ได้กำหนด' : `${item.exp}`}`}
             imagepath={`${item.imagepath}`}
             item={item}
           />

@@ -15,7 +15,8 @@ import Checkbox from "expo-checkbox";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import Icon from 'react-native-vector-icons/FontAwesome';
 import axios from "axios";
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { storeData } from "../utils/getUserAccount";
 const logo = require("../assets/image/1.png");
 
 export default function RegisterScreen({ navigation }) {
@@ -54,18 +55,13 @@ export default function RegisterScreen({ navigation }) {
       "fullname": name,
       "dateofbirth": formattedDate
     }
-    // const formData = new FormData();
-    // formData.append("idcard", idcard);
-    // formData.append("password", password);
-    // formData.append("fullname", name);
-    // formData.append("dateofbirth", formattedDate);
-    // console.log(formData);
     try {
       const response = await axios.post(
-        `http://172.20.10.2:3000/api/auth/register`,
+        `http://172.20.10.3:3000/api/auth/register`,
         data,
       );
       if (!response.ok) {
+        storeData(response.data.idcard);
         navigation.navigate("Homepage", { username: idcard });
       } else {
         alert("Register Failed, Please Trying Again.");
@@ -244,13 +240,13 @@ export default function RegisterScreen({ navigation }) {
               marginLeft: 45,
             }}
           >
-            <Checkbox
+            {/* <Checkbox
               style={{ margin: 10 }}
               value={isChecked}
               onValueChange={setChecked}
               color={isChecked ? "#18253B" : undefined}
             />
-            <Text style={{ fontWeight: "bold" }}>Remember me</Text>
+            <Text style={{ fontWeight: "bold" }}>Remember me</Text> */}
           </View>
 
           <View style={{ justifyContent: "center", alignItems: "center" }}>

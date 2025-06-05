@@ -13,6 +13,7 @@ import {
 
 import * as ImagePicker from "expo-image-picker";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { getData } from "../utils/getUserAccount";
 //หน้าถัดไป
 export default function NextScreen({ navigation }) {
   const [data, setData] = useState({});
@@ -67,15 +68,18 @@ export default function NextScreen({ navigation }) {
     }
     setIsUploading(true);
     const formData = new FormData();
+    const username = await getData();
     formData.append("image", {
       uri: imageUri,
       type: "image/jpeg",
       name: "upload.jpg",
     });
 
+    formData.append('idcard', username);
+
     try {
       const response = await axios.post(
-        `http://172.20.10.2:3000/api/images/uploads`,
+        `http://172.20.10.3:3000/api/images/uploads`,
         formData,
         {
           headers: {

@@ -20,15 +20,9 @@ const ReminderScreen = () => {
   const [afterNumberOfDays, setAfterNumberOfDays] = useState(7);
 
   const [beforeMealSchedules, setBeforeMealSchedules] = useState([
-    { hour: 8, minute: 0, pills: 1 },
-    { hour: 12, minute: 0, pills: 1 },
-    { hour: 18, minute: 0, pills: 1 },
   ]);
 
   const [afterMealSchedules, setAfterMealSchedules] = useState([
-    { hour: 8, minute: 0, pills: 1 },
-    { hour: 12, minute: 0, pills: 1 },
-    { hour: 18, minute: 0, pills: 1 },
   ]);
 
   const [selectedIndex, setSelectedIndex] = useState(null);
@@ -151,19 +145,26 @@ const ReminderScreen = () => {
     : now;
 
   useEffect(() => {
-    const interval = setInterval(() => {
+    const interval = setInterval(async () => {
       const now = new Date();
       const nowHour = now.getHours();
       const nowMinute = now.getMinutes();
-
-      [...beforeMealSchedules, ...afterMealSchedules].forEach((schedule) => {
+      const storedBeforeSchedules = await AsyncStorage.getItem("beforeMealSchedules");
+      const storedAfterSchedules = await AsyncStorage.getItem("afterMealSchedules");
+      const beforeSchedulesArray = storedBeforeSchedules ? JSON.parse(storedBeforeSchedules) : [];
+      const afterSchedulesArray = storedAfterSchedules ? JSON.parse(storedAfterSchedules) : [];
+      [...beforeSchedulesArray, ...afterSchedulesArray].forEach((schedule) => {
         if (nowHour === schedule.hour && nowMinute === schedule.minute) {
+          console.log('Alert!!!!!!')
           setAlertData({
             time: `${schedule.hour}:${schedule.minute}`,
             pills: schedule.pills,
           });
+        // } else {
+        //   console.log('No alerts.')
         }
       });
+      console.log()
     }, 60000); // ทุก 1 นาที
 
     return () => clearInterval(interval); // ล้าง timer ตอน component unmount
@@ -171,15 +172,33 @@ const ReminderScreen = () => {
 
   useEffect(() => {
     const loadStartDate = async () => {
+      const storedBeforeSchedules = await AsyncStorage.getItem("beforeMealSchedules");
+      const storedAfterSchedules = await AsyncStorage.getItem("afterMealSchedules");
+      if (true){
+        const beforeSchedulesArray = storedBeforeSchedules ? JSON.parse(storedBeforeSchedules) : [];
+        setBeforeMealSchedules(beforeSchedulesArray);
+      }
+
+      if (true){
+        const afterSchedulesArray = storedAfterSchedules ? JSON.parse(storedAfterSchedules) : [];
+        setAfterMealSchedules(afterSchedulesArray);
+      }
+      
+      
+
       const storedStartDate = await AsyncStorage.getItem("startDate");
       const storedNumberOfDays = await AsyncStorage.getItem("numberOfDays");
+      console.log(storedNumberOfDays)
+      
       const storedBeforeNumberOfDays = await AsyncStorage.getItem(
         "beforeNumberOfDays"
       );
+      console.log(storedBeforeNumberOfDays)
+
       const storedAfterNumberOfDays = await AsyncStorage.getItem(
         "afterNumberOfDays"
       );
-
+      console.log(storedAfterNumberOfDays)
       if (storedStartDate && storedNumberOfDays) {
         const startDate = new Date(storedStartDate);
         const today = new Date();
@@ -190,6 +209,7 @@ const ReminderScreen = () => {
         const originalDays = parseInt(storedNumberOfDays, 10);
         const updatedDays = originalDays - daysPassed;
 
+        
         if (updatedDays <= 0) {
           setNumberOfDays(0);
           setBeforeMealSchedules([]);
