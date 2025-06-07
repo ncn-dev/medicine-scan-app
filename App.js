@@ -20,71 +20,71 @@ const Stack = createStackNavigator();
 
 export default function App() {
   return (
-      <ReminderProvider>
-        <NavigationContainer>
-          <Stack.Navigator
-            initialRouteName="Home"
-            screenOptions={{
-              headerShown: false,
-            }}
-          >
-            <Stack.Screen
-              name="Home"
-              component={HomeScreen}
-              options={{ gestureEnabled: false }}
-            />
-            <Stack.Screen
-              name="NextScreen"
-              component={NextScreen}
-              options={{ gestureEnabled: false }}
-            />
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              options={{ gestureEnabled: false }}
-            />
-            <Stack.Screen
-              name="Register"
-              component={RegisterScreen}
-              options={{ gestureEnabled: false }}
-            />
-            <Stack.Screen
-              name="Homepage"
-              component={Homepage}
-              options={{ gestureEnabled: false }}
-            />
-            <Stack.Screen
-              name="InformationScreen"
-              component={InformationSceen}
-            />
-            <Stack.Screen 
-              name="SettingPage" 
-              component={SettingPage} 
-              options={{ gestureEnabled: false }}
-            />
-            <Stack.Screen
-              name="MedBag"
-              component={MedBag}
-              options={{ gestureEnabled: false }}
-            />
-            <Stack.Screen 
-              name="Detail" 
-              component={Detail} 
-              options={{ gestureEnabled: false }}
-            />
-            <Stack.Screen
-              name="Chatbot"
-              component={Chatbot}
-              options={{ gestureEnabled: false }}
-            />
-            <Stack.Screen
-              name="ReminderScreen"
-              component={ReminderScreen}
-              options={{ gestureEnabled: false }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </ReminderProvider>
-    
+    <ReminderProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="InformationScreen"
+          screenOptions={{
+            headerShown: false,
+          }}
+        >
+          <Stack.Screen
+            name="Home"
+            component={HomeScreen}
+            options={{ gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="NextScreen"
+            component={NextScreen}
+            options={{ gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="Login"
+            component={LoginScreen}
+            options={{ gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="Register"
+            component={RegisterScreen}
+            options={{ gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="Homepage"
+            component={Homepage}
+            options={{ gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="InformationScreen"
+            component={InformationSceen}
+          />
+          <Stack.Screen
+            name="SettingPage"
+            component={SettingPage}
+            options={{ gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="MedBag"
+            component={MedBag}
+            options={{ gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="Detail"
+            component={Detail}
+            options={{ gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="Chatbot"
+            component={Chatbot}
+            options={{ gestureEnabled: false }}
+          />
+          <Stack.Screen
+            name="ReminderScreen"
+            component={ReminderScreen}
+            options={{ gestureEnabled: false }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ReminderProvider>
+
   );
 }
