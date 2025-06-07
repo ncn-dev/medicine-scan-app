@@ -128,13 +128,22 @@ export default function MedBag({ navigation, route }) {
         {/* ส่วนบน */}
         <View
           style={{
-            backgroundColor: expired ? "#e60000" : "#077d23",
+            backgroundColor:
+              item.exp == null || item.exp === ""
+                ? "#FFA500" // สีส้ม สำหรับยังไม่กำหนดวันหมดอายุ
+                : expired
+                ? "#e60000" // สีแดงถ้าหมดอายุ
+                : "#077d23", // สีเขียวถ้ายังไม่หมดอายุ
             padding: 10,
             alignItems: "center",
           }}
         >
           <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
-            {expired ? "หมดอายุแล้ว โปรดนำไปทิ้งโดยด่วน" : ""}
+            {item.exp == null || item.exp === ""
+              ? "ยังไม่กำหนดวันหมดอายุ"
+              : expired
+              ? "หมดอายุแล้ว โปรดนำไปทิ้งโดยด่วน"
+              : ""}
           </Text>
         </View>
 

@@ -263,6 +263,17 @@ const ReminderScreen = () => {
         {/*กล่องทานยาก่อนอาหาร*/}
         <View style={styles.reminderBox}>
           <Text style={styles.subTitle}>ตั้งเวลาเตือน (ก่อนอาหาร)</Text>
+          <TouchableOpacity
+            style={styles.buttonReset}
+            onPress={() => {
+            // reset schedules เป็น empty array หรือค่า default ที่คุณต้องการ
+            setBeforeMealSchedules([]);
+            setBeforeNumberOfDays(0);
+          }}
+          >
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>รีเซต</Text>
+          </TouchableOpacity>
+
           <View style={{ flexDirection: "row", gap: 10 }}>
             <View style={styles.blueBadge}>
               <TouchableOpacity
@@ -355,6 +366,18 @@ const ReminderScreen = () => {
         {/*กล่องทานยาหลังอาหาร*/}
         <View style={styles.reminderBox}>
           <Text style={styles.subTitle}>ตั้งเวลาเตือน (หลังอาหาร)</Text>
+
+          <TouchableOpacity
+            style={styles.buttonReset}
+            onPress={() => {
+            // reset schedules เป็น empty array หรือค่า default ที่คุณต้องการ
+            setAfterMealSchedules([]);
+            setAfterNumberOfDays(0);
+          }}
+          >
+            <Text style={{ color: 'white', fontWeight: 'bold' }}>รีเซต</Text>
+          </TouchableOpacity>
+
           <View style={{ flexDirection: "row", gap: 10 }}>
             <View style={styles.blueBadge}>
               <TouchableOpacity
@@ -513,6 +536,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
+  buttonReset:{
+    alignSelf: "flex-end",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: "#8B0000",
+    borderRadius:  10,
+    marginTop: -30
+
+  }
 });
 
 export default ReminderScreen;
