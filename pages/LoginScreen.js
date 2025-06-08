@@ -27,7 +27,7 @@ export default function LoginScreen({ navigation }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isChecked, setChecked] = useState(false);
-  const [isPasswordVisible,setIsPasswordVisible] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
 
 
@@ -38,20 +38,20 @@ export default function LoginScreen({ navigation }) {
       return;
     }
     const data = {
-      "idcard" : username, 
-      "password" : password
+      "idcard": username,
+      "password": password
     }
     // const formData = new FormData();
     // formData.append("idcard", username);
     // formData.append("password", password);
     try {
       const response = await axios.post(
-        `http://172.20.10.3:3000/api/auth/login`,
+        `https://m66pnkvf-3000.asse.devtunnels.ms/api/auth/login`,
         data,
       );
       if (!response.ok) {
         storeData(response.data.idcard);
-        navigation.navigate("Homepage", {username : username});
+        navigation.navigate("Homepage", { username: username });
       } else {
         alert("Login Failed, Please Trying Again.");
       }
@@ -66,8 +66,8 @@ export default function LoginScreen({ navigation }) {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-        <View style={{ flex: 1, backgroundColor: "#FFFF",marginTop:90 }}>
-          
+        <View style={{ flex: 1, backgroundColor: "#FFFF", marginTop: 90 }}>
+
           <View>
             <Text
               style={{
@@ -136,19 +136,19 @@ export default function LoginScreen({ navigation }) {
             />
             <TouchableOpacity
               style={{
-                position:"absolute",
-                right:70,
-                top:"33%",
-                transform: [{ translateY: -10 }], 
+                position: "absolute",
+                right: 70,
+                top: "33%",
+                transform: [{ translateY: -10 }],
                 marginTop: 10
               }}
               onPress={() => setIsPasswordVisible(!isPasswordVisible)}
             >
-            <Icon
-              name={isPasswordVisible ? "eye" : "eye-slash"}
-              size={25}
-              color="#666"
-            />
+              <Icon
+                name={isPasswordVisible ? "eye" : "eye-slash"}
+                size={25}
+                color="#666"
+              />
             </TouchableOpacity>
             {/*Checkbox*/}
             <View

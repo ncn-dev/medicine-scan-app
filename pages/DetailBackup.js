@@ -94,7 +94,7 @@ export default function Detail({ route, navigation }) {
     console.log(data);
     try {
       const response = await axios.post(
-        `http://172.20.10.3:3000/api/user/updatemedbag`,
+        `https://m66pnkvf-3000.asse.devtunnels.ms/api/user/updatemedbag`,
         data
       );
       if (!response.ok) {
@@ -144,7 +144,7 @@ export default function Detail({ route, navigation }) {
         </View>
         <Image
           source={{
-            uri: `http://172.20.10.3:3000/api/uploads/${editedItem.imagepath}`,
+            uri: `https://m66pnkvf-3000.asse.devtunnels.ms/api/uploads/${editedItem.imagepath}`,
           }}
           style={{
             width: 270,
@@ -765,11 +765,11 @@ export default function Detail({ route, navigation }) {
               <Text style={{ fontSize: 18, fontWeight: "bold" }}>
                 วิธีการใช้งาน:{" "}
               </Text>
-              <Text style={{ 
-                fontSize: 18, 
-                flexShrink: 1, 
-                maxWidth: "100%" 
-                }}
+              <Text style={{
+                fontSize: 18,
+                flexShrink: 1,
+                maxWidth: "100%"
+              }}
                 numberOfLines={2}
                 ellipsizeMode="tail"
               >
@@ -806,31 +806,31 @@ export default function Detail({ route, navigation }) {
               color="white"
             />
           </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                backgroundColor: "#D9D9D9",
-                padding: 10,
-                borderRadius: 10,
-                marginTop: 5,
-                width: "100%",
-                height: 50,
-              }}
-              onPress={() => setModalVisible(true)}
-            >
-
-            
-          <View
+          <TouchableOpacity
             style={{
               backgroundColor: "#D9D9D9",
               padding: 10,
               borderRadius: 10,
               marginTop: 5,
               width: "100%",
+              height: 50,
             }}
+            onPress={() => setModalVisible(true)}
           >
-            <Text style={{ fontSize: 18, fontWeight: "bold" }}>ผลกระทบ: </Text>
-            <Text style={{ fontSize: 18 }}>{editedItem.effect}</Text>
-          </View>
+
+
+            <View
+              style={{
+                backgroundColor: "#D9D9D9",
+                padding: 10,
+                borderRadius: 10,
+                marginTop: 5,
+                width: "100%",
+              }}
+            >
+              <Text style={{ fontSize: 18, fontWeight: "bold" }}>ผลกระทบ: </Text>
+              <Text style={{ fontSize: 18 }}>{editedItem.effect}</Text>
+            </View>
           </TouchableOpacity>
         </View>
         <View

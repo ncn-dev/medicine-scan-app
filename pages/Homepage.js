@@ -9,13 +9,14 @@ import {
   ScrollView,
   Modal,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "react-native";
 import axios from "axios";
 import { FlatList, TextInput } from "react-native-gesture-handler";
 //import { Item } from "react-native-paper/lib/typescript/components/Drawer/Drawer";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { ReminderContext } from "./ReminderContext";
-import { getData } from "../utils/getUserAccount";
+import { getData, getMedicineAfter, getMedicineBefore } from "../utils/getUserAccount";
 import { SafeAreaView } from 'react-native';
 export default function Homepage({ route, navigation }) {
   const [seach, setseach] = useState("");
@@ -24,6 +25,34 @@ export default function Homepage({ route, navigation }) {
   const [visible, setVisible] = useState(false);
   const [pillCount, setPillCount] = useState(0);
   const [isInitialRender, setIsInitialRender] = useState(true);
+  const [eatBefore, setEatBefore] = useState([]);
+  const [eatAfter, setEatAfter] = useState([]);
+
+  useEffect(() => {
+    const fetchingData = async () => {
+      const eatBeforeData = await AsyncStorage.getItem("eatBefore");
+      console.log('Before Data : ', eatBeforeData)
+      const eatAfterData = await AsyncStorage.getItem("eatAfter");
+      console.log('After Data : ', eatAfterData)
+
+      if (eatBeforeData) {
+        setEatBefore(JSON.parse(eatBeforeData));
+        console.log('Eat Before : ', JSON.parse(eatBeforeData));
+      } else {
+        setEatBefore([]);
+      }
+
+      if (eatAfterData) {
+        setEatAfter(JSON.parse(eatAfterData));
+        console.log('Eat After : ', JSON.parse(eatAfterData));
+      } else {
+        setEatAfter([]);
+      }
+    };
+    fetchingData();
+    console.log("useEffect for eatBefore and eatAfter called");
+
+  }, []);
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -35,24 +64,24 @@ export default function Homepage({ route, navigation }) {
   const fetchData = async () => {
     try {
       const username = await getData();
-      await console.log(username);
-      if(!username){
+      // await console.log(username);
+      if (!username) {
         navigation.navigate("Home")
-        
+
       }
       const response = await axios.get(
-        `http://172.20.10.3:3000/api/user/medbag/${username}`
+        `https://m66pnkvf-3000.asse.devtunnels.ms/api/user/medbag/${username}`
       );
       await setData(response.data);
-      console.log(data);
+      // console.log(data);
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     }
   };
 
   useEffect(() => {
     fetchData();
-    
+
   }, []);
 
   useEffect(() => {
@@ -94,42 +123,79 @@ export default function Homepage({ route, navigation }) {
   const imageSize = Dimensions.get("window").width * 0.8;
 
   const isExpired = (expDate) => {
-    console.log('EXP DATE', expDate)
-    if(expDate === null){
+    // console.log('EXP DATE', expDate)
+    if (expDate === null) {
       return true;
     }
     const today = new Date();
     const exp = new Date(expDate);
     const diffTime = exp - today;
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    console.log(diffDays);
+    // console.log(diffDays);
     return diffDays;
   };
 
   return (
     <View style={{ marginTop: 10, backgroundColor: "#FFFFFF" }}>
-      <Modal visible={visible} transparent={true} animationType="fade">
+      <Modal visible={visible} transparent animationType="fade">
         <View
           style={{
             flex: 1,
             justifyContent: "center",
             alignItems: "center",
+            backgroundColor: "rgba(0,0,0,0.5)", // dim background
           }}
         >
           <View
             style={{
-              backgroundColor: "white",
-              padding: 20,
-              borderRadius: 10,
-              alignItems: "center",
-              width: "70%",
+              backgroundColor: "#fff",
+              padding: 24,
+              borderRadius: 20,
+              width: "80%",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.3,
+              shadowRadius: 6,
+              elevation: 10,
             }}
           >
-            <Text style={{ fontSize: 18, marginBottom: 10 }}>
-              ถึงเวลากินยาแล้ว!
+            <Text style={{ fontSize: 20, fontWeight: "bold", textAlign: "center", marginBottom: 16 }}>
+              💊 กรุณาอย่าลืมทานยาในวันนี้นะคะ
             </Text>
-            <Text>จำนวน: {pillCount} เม็ด 💊</Text>
-            <Button title="ตกลง" onPress={closeModal} />
+
+            <View style={{ marginBottom: 16 }}>
+              <Text style={{ fontWeight: "600", fontSize: 16, marginBottom: 4 }}>ก่อนอาหาร</Text>
+              <Text style={{ fontSize: 15, color: "#444" }}>
+                {eatBefore.length > 0
+                  ? eatBefore.join(", ")
+                  : "ไม่มียาที่ต้องทานก่อนอาหาร"}
+              </Text>
+            </View>
+
+            <View style={{ marginBottom: 16 }}>
+              <Text style={{ fontWeight: "600", fontSize: 16, marginBottom: 4 }}>หลังอาหาร</Text>
+              <Text style={{ fontSize: 15, color: "#444" }}>
+                {eatAfter.length > 0
+                  ? eatAfter.join(", ")
+                  : "ไม่มียาที่ต้องทานหลังอาหาร"}
+              </Text>
+            </View>
+
+            <Text style={{ fontSize: 15, marginBottom: 24, color: "#666", textAlign: "center" }}>
+              รวมทั้งหมด {eatBefore.length + eatAfter.length} เม็ด
+            </Text>
+
+            <TouchableOpacity
+              onPress={closeModal}
+              style={{
+                backgroundColor: "#4CAF50",
+                paddingVertical: 12,
+                borderRadius: 10,
+                alignItems: "center",
+              }}
+            >
+              <Text style={{ color: "#fff", fontSize: 16, fontWeight: "bold" }}>ตกลง</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -254,9 +320,9 @@ export default function Homepage({ route, navigation }) {
             </View>
           ) : (
             data.map((item) => {
-              console.log(expired);
+              // console.log(expired);
               const expired = isExpired(item.exp);
-              console.log('Nonpawit', typeof expired);
+              // console.log('Nonpawit', typeof expired);
               return (
                 <View
                   key={item.id} // ใช้ key ที่ไม่ซ้ำกัน (มักจะใช้ ID)
@@ -301,9 +367,9 @@ export default function Homepage({ route, navigation }) {
                       fontWeight: "bold",
                     }}
                   >
-                      {
-                        expired === true ? "ท่านยังไม่ได้ตั้งวันหมดอายุของยา" : expired < 0 ? "ยาหมดอายุแล้ว" : "กำลังจะหมดอายุภายใน"
-                      }
+                    {
+                      expired === true ? "ท่านยังไม่ได้ตั้งวันหมดอายุของยา" : expired < 0 ? "ยาหมดอายุแล้ว" : "กำลังจะหมดอายุภายใน"
+                    }
                   </Text>
 
                   <Text
@@ -313,7 +379,7 @@ export default function Homepage({ route, navigation }) {
                       color: expired < 0 ? "#e60000" : "#000000",
                     }}
                   >
-                    { 
+                    {
                       expired === true ? "" : expired < 0 ? 'อันตรายถึงชีวิต' : `${expired} วัน`
                     }
                   </Text>
@@ -346,7 +412,7 @@ export default function Homepage({ route, navigation }) {
             <TouchableOpacity
               style={{ zIndex: 100, elevation: 10 }}
               onPress={() => {
-                console.log("Navigating to MedBag");
+                // console.log("Navigating to MedBag");
                 navigation.navigate("MedBag");
               }}
             >

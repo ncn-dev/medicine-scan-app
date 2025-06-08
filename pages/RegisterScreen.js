@@ -26,13 +26,13 @@ export default function RegisterScreen({ navigation }) {
   const [date, setDate] = useState(new Date());
   const [showDatePicker, setshowDatePicker] = useState(false);
   const [isChecked, setChecked] = useState(false);
-  const [isPasswordVisible,setIsPasswordVisible] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const onDataChange = (event, selectedDate) => {
     setshowDatePicker(false);
     if (selectedDate) {
       setDate(selectedDate);
-    }else{
+    } else {
       alert("please select a valid date");
     }
   };
@@ -42,10 +42,10 @@ export default function RegisterScreen({ navigation }) {
       alert("Please input information");
       return;
     }
-    
+
     const formattedDate = date instanceof Date ? date.toISOString().split('T')[0] : ""; // format date to YYYY-MM-DD
-    
-    if (!formattedDate){
+
+    if (!formattedDate) {
       alert("Invalid date");
       return;
     }
@@ -57,7 +57,7 @@ export default function RegisterScreen({ navigation }) {
     }
     try {
       const response = await axios.post(
-        `http://172.20.10.3:3000/api/auth/register`,
+        `https://m66pnkvf-3000.asse.devtunnels.ms/api/auth/register`,
         data,
       );
       if (!response.ok) {
@@ -160,18 +160,18 @@ export default function RegisterScreen({ navigation }) {
             />
             <TouchableOpacity
               style={{
-                position:"absolute",
-                right:70,
-                top:"39%",
+                position: "absolute",
+                right: 70,
+                top: "39%",
                 transform: [{ translateY: -10 }],
               }}
               onPress={() => setIsPasswordVisible(!isPasswordVisible)}
             >
-            <Icon
-              name={isPasswordVisible ? "eye" : "eye-slash"}
-              size={25}
-              color="#666"
-            />
+              <Icon
+                name={isPasswordVisible ? "eye" : "eye-slash"}
+                size={25}
+                color="#666"
+              />
 
             </TouchableOpacity>
             <Text
@@ -281,7 +281,7 @@ export default function RegisterScreen({ navigation }) {
               >
                 Already have account,
               </Text>
-              
+
               <TouchableOpacity onPress={() => navigation.navigate("Login")}>
                 <Text
                   style={{

@@ -111,7 +111,7 @@ const ReminderScreen = () => {
     const formattedHour = hour % 12 || 12;
     const ampm = hour < 12 ? "AM" : "PM";
     const formattedMinute = String(minute).padStart(2, "0");
-    
+
     let period = "";
     if (hour >= 5 && hour < 11) {
       period = "เช้า";
@@ -136,12 +136,12 @@ const ReminderScreen = () => {
 
   const selectedTime = selectedSchedule
     ? new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate(),
-        selectedSchedule.hour,
-        selectedSchedule.minute
-      )
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      selectedSchedule.hour,
+      selectedSchedule.minute
+    )
     : now;
 
   useEffect(() => {
@@ -156,40 +156,42 @@ const ReminderScreen = () => {
       [...beforeSchedulesArray, ...afterSchedulesArray].forEach((schedule) => {
         if (nowHour === schedule.hour && nowMinute === schedule.minute) {
           console.log('Alert!!!!!!')
+          console.log(schedule.type);
           setAlertData({
             time: `${schedule.hour}:${schedule.minute}`,
             pills: schedule.pills,
+            type: schedule.type, // 'before' หรือ 'after'
           });
-        // } else {
-        //   console.log('No alerts.')
+          // } else {
+          //   console.log('No alerts.')
         }
       });
       console.log()
     }, 60000); // ทุก 1 นาที
 
-    return () => clearInterval(interval); // ล้าง timer ตอน component unmount
+    return () => clearInterval(interval); // ล้าง timer ตอน component unmounght
   }, []);
 
   useEffect(() => {
     const loadStartDate = async () => {
       const storedBeforeSchedules = await AsyncStorage.getItem("beforeMealSchedules");
       const storedAfterSchedules = await AsyncStorage.getItem("afterMealSchedules");
-      if (true){
+      if (true) {
         const beforeSchedulesArray = storedBeforeSchedules ? JSON.parse(storedBeforeSchedules) : [];
         setBeforeMealSchedules(beforeSchedulesArray);
       }
 
-      if (true){
+      if (true) {
         const afterSchedulesArray = storedAfterSchedules ? JSON.parse(storedAfterSchedules) : [];
         setAfterMealSchedules(afterSchedulesArray);
       }
-      
-      
+
+
 
       const storedStartDate = await AsyncStorage.getItem("startDate");
       const storedNumberOfDays = await AsyncStorage.getItem("numberOfDays");
       console.log(storedNumberOfDays)
-      
+
       const storedBeforeNumberOfDays = await AsyncStorage.getItem(
         "beforeNumberOfDays"
       );
@@ -209,7 +211,7 @@ const ReminderScreen = () => {
         const originalDays = parseInt(storedNumberOfDays, 10);
         const updatedDays = originalDays - daysPassed;
 
-        
+
         if (updatedDays <= 0) {
           setNumberOfDays(0);
           setBeforeMealSchedules([]);
@@ -262,14 +264,14 @@ const ReminderScreen = () => {
 
         {/*กล่องทานยาก่อนอาหาร*/}
         <View style={styles.reminderBox}>
-          <Text style={styles.subTitle}>ตั้งเวลาเตือน (ก่อนอาหาร)</Text>
+          <Text style={styles.subTitle}>ตั้งเวลาเตือน</Text>
           <TouchableOpacity
             style={styles.buttonReset}
             onPress={() => {
-            // reset schedules เป็น empty array หรือค่า default ที่คุณต้องการ
-            setBeforeMealSchedules([]);
-            setBeforeNumberOfDays(0);
-          }}
+              // reset schedules เป็น empty array หรือค่า default ที่คุณต้องการ
+              setBeforeMealSchedules([]);
+              setBeforeNumberOfDays(0);
+            }}
           >
             <Text style={{ color: 'white', fontWeight: 'bold' }}>รีเซต</Text>
           </TouchableOpacity>
@@ -364,16 +366,16 @@ const ReminderScreen = () => {
         </View>
 
         {/*กล่องทานยาหลังอาหาร*/}
-        <View style={styles.reminderBox}>
+        {/* <View style={styles.reminderBox}>
           <Text style={styles.subTitle}>ตั้งเวลาเตือน (หลังอาหาร)</Text>
 
           <TouchableOpacity
             style={styles.buttonReset}
             onPress={() => {
-            // reset schedules เป็น empty array หรือค่า default ที่คุณต้องการ
-            setAfterMealSchedules([]);
-            setAfterNumberOfDays(0);
-          }}
+              // reset schedules เป็น empty array หรือค่า default ที่คุณต้องการ
+              setAfterMealSchedules([]);
+              setAfterNumberOfDays(0);
+            }}
           >
             <Text style={{ color: 'white', fontWeight: 'bold' }}>รีเซต</Text>
           </TouchableOpacity>
@@ -462,7 +464,7 @@ const ReminderScreen = () => {
               </TouchableOpacity>
             </View>
           ))}
-        </View>
+        </View> */}
 
         <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
           <Text style={styles.saveText}>บันทึกการแจ้งเตือน</Text>
@@ -536,12 +538,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  buttonReset:{
+  buttonReset: {
     alignSelf: "flex-end",
     paddingHorizontal: 12,
     paddingVertical: 6,
     backgroundColor: "#8B0000",
-    borderRadius:  10,
+    borderRadius: 10,
     marginTop: -30
 
   }

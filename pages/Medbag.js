@@ -20,24 +20,24 @@ export default function MedBag({ navigation, route }) {
   const [modalVisible, setModalVisible] = useState(false);
   const prevDataLength = useRef(0);
   const isFirstLoad = useRef(true);
-  
+
 
   const fetchData = async (uploaded = false) => {
     try {
       const username = await getData();
       const response = await axios.get(
-        `http://172.20.10.3:3000/api/user/medbag/${username}`
+        `https://m66pnkvf-3000.asse.devtunnels.ms/api/user/medbag/${username}`
       );
       const newData = response.data;
-  
+
       if (uploaded) {
         console.log("Modal เปิดเพราะอัปโหลดเสร็จ");
         setModalVisible(true);
       }
-  
+
       setData(newData); // ตั้งค่าใหม่ให้กับ data
       prevDataLength.current = newData.length;
-      
+
       console.log(newData); // แสดงข้อมูลที่ได้จากการดึงข้อมูล
     } catch (err) {
       console.error(err);
@@ -56,7 +56,7 @@ export default function MedBag({ navigation, route }) {
   }, [route.params, navigation]);
 
   const isExpired = (expDate) => {
-    if(expDate === null){
+    if (expDate === null) {
       return false;
     }
     const today = new Date();
@@ -68,7 +68,7 @@ export default function MedBag({ navigation, route }) {
   const deleteData = async (id) => {
     try {
       const response = await axios.post(
-        `http://172.20.10.3:3000/api/user/deletemedbag/${id}`
+        `https://m66pnkvf-3000.asse.devtunnels.ms/api/user/deletemedbag/${id}`
       );
       console.log(response.data.message); // ตรวจสอบข้อความตอบกลับ
 
@@ -109,74 +109,74 @@ export default function MedBag({ navigation, route }) {
   );
 
   const Card = ({ name, dose, date, item, imagepath }) => {
-  const expired = isExpired(item.exp);
-  return (
-    <Swipeable renderRightActions={() => renderRightActions(item.id)}>
-      <TouchableOpacity
-        onPress={() => {
-          console.log("ดูรายละเอียด", item);
-          navigation.navigate("Detail", { item: item });
-        }}
-        style={{
-          borderRadius: 10,
-          overflow: "hidden",
-          marginVertical: 10,
-          backgroundColor: "#fff",
-          elevation: 5,
-        }}
-      >
-        {/* ส่วนบน */}
-        <View
+    const expired = isExpired(item.exp);
+    return (
+      <Swipeable renderRightActions={() => renderRightActions(item.id)}>
+        <TouchableOpacity
+          onPress={() => {
+            console.log("ดูรายละเอียด", item);
+            navigation.navigate("Detail", { item: item });
+          }}
           style={{
-            backgroundColor:
-              item.exp == null || item.exp === ""
-                ? "#FFA500" // สีส้ม สำหรับยังไม่กำหนดวันหมดอายุ
-                : expired
-                ? "#e60000" // สีแดงถ้าหมดอายุ
-                : "#077d23", // สีเขียวถ้ายังไม่หมดอายุ
-            padding: 10,
-            alignItems: "center",
+            borderRadius: 10,
+            overflow: "hidden",
+            marginVertical: 10,
+            backgroundColor: "#fff",
+            elevation: 5,
           }}
         >
-          <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
-            {item.exp == null || item.exp === ""
-              ? "ยังไม่กำหนดวันหมดอายุ"
-              : expired
-              ? "หมดอายุแล้ว โปรดนำไปทิ้งโดยด่วน"
-              : ""}
-          </Text>
-        </View>
-
-        {/* ส่วนล่าง */}
-        <View
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor: "#DCDCDC",
-            padding: 10,
-          }}
-        >
-          <Image
-            source={{
-              uri: `http://172.20.10.3:3000/api/uploads/${imagepath}`,
-            }}
+          {/* ส่วนบน */}
+          <View
             style={{
-              width: 70,
-              height: 70,
-              borderRadius: 8,
-              marginRight: 10,
+              backgroundColor:
+                item.exp == null || item.exp === ""
+                  ? "#FFA500" // สีส้ม สำหรับยังไม่กำหนดวันหมดอายุ
+                  : expired
+                    ? "#e60000" // สีแดงถ้าหมดอายุ
+                    : "#077d23", // สีเขียวถ้ายังไม่หมดอายุ
+              padding: 10,
+              alignItems: "center",
             }}
-          />
-          <View>
-            <Text style={{ fontWeight: "bold", fontSize: 14 }}>{name}</Text>
-            <Text style={{ color: "#555", marginTop: 5 }}>{dose}</Text>
-            <Text style={{ color: "#555", marginTop: 5 }}>{date}</Text>
+          >
+            <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 16 }}>
+              {item.exp == null || item.exp === ""
+                ? "ยังไม่กำหนดวันหมดอายุ"
+                : expired
+                  ? "หมดอายุแล้ว โปรดนำไปทิ้งโดยด่วน"
+                  : ""}
+            </Text>
           </View>
-        </View>
-      </TouchableOpacity>
-    </Swipeable>
-  );
-};
+
+          {/* ส่วนล่าง */}
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "#DCDCDC",
+              padding: 10,
+            }}
+          >
+            <Image
+              source={{
+                uri: `https://m66pnkvf-3000.asse.devtunnels.ms/api/uploads/${imagepath}`,
+              }}
+              style={{
+                width: 70,
+                height: 70,
+                borderRadius: 8,
+                marginRight: 10,
+              }}
+            />
+            <View>
+              <Text style={{ fontWeight: "bold", fontSize: 14 }}>{name}</Text>
+              <Text style={{ color: "#555", marginTop: 5 }}>{dose}</Text>
+              <Text style={{ color: "#555", marginTop: 5 }}>{date}</Text>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Swipeable>
+    );
+  };
 
 
   const { beforeMealReminder, afterMealReminder, saveReminderSettings } =
@@ -302,7 +302,7 @@ export default function MedBag({ navigation, route }) {
                   navigation.navigate("ReminderScreen")
                 }}
               >
-                <Text style={{ color: "#0022e6", fontSize:17 }}>
+                <Text style={{ color: "#0022e6", fontSize: 17 }}>
                   ตกลง
                 </Text>
               </Pressable>
@@ -314,11 +314,11 @@ export default function MedBag({ navigation, route }) {
                   paddingHorizontal: 20,
                   borderRadius: 5,
                   marginLeft: 70
-                 
+
                 }}
                 onPress={() => setModalVisible(false)}
               >
-                <Text style={{ color: "#e60000", fontSize:17 }}>ยกเลิก</Text>
+                <Text style={{ color: "#e60000", fontSize: 17 }}>ยกเลิก</Text>
               </Pressable>
             </View>
           </View>

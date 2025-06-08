@@ -72,9 +72,8 @@ export default function ChatScreen({ route, navigation }) {
     setInput("");
 
     try {
-      // 2) ส่ง history + userMessage ไปขอคำตอบหลัก
       const historyToSend = [...chatHistory, userMessage];
-      const response = await axios.post("http://172.20.10.3:3000/api/chatbot", {
+      const response = await axios.post("https://m66pnkvf-3000.asse.devtunnels.ms/api/chatbot", {
         history: historyToSend,
       });
       const replyText = response.data.reply_message;
@@ -97,7 +96,7 @@ export default function ChatScreen({ route, navigation }) {
 
       **ให้ออกมาเป็น array ของ string ภาษาไทย เท่านั้น**`;
       const followUpRes = await axios.post(
-        "http://172.20.10.3:3000/api/chatbot",
+        "https://m66pnkvf-3000.asse.devtunnels.ms/api/chatbot",
         {
           history: [
             ...historyToSend,
@@ -252,7 +251,7 @@ export default function ChatScreen({ route, navigation }) {
     });
     try {
       const response = await axios.post(
-        `http://172.20.10.3:3000/api/images/uploads`,
+        `https://m66pnkvf-3000.asse.devtunnels.ms/api/images/uploads`,
         formData,
         {
           headers: {

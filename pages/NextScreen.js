@@ -37,29 +37,29 @@ export default function NextScreen({ navigation }) {
   };
   useEffect(() => {
     const openCamera = async () => {
-      try{
+      try {
         const { status } = await ImagePicker.requestCameraPermissionsAsync();
         if (status !== "granted") {
           alert("Permission to access me dia library is required");
           return;
         }
-        
-      const result = await ImagePicker.launchCameraAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-      });
-      if (!result.canceled) {
-        setImageUri(result.assets[0].uri);
+
+        const result = await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.Images,
+          allowsEditing: true,
+          aspect: [4, 3],
+        });
+        if (!result.canceled) {
+          setImageUri(result.assets[0].uri);
+        }
+      } catch (error) {
+
       }
-      }catch(error){
-        
-      }
-     
+
 
     };
     openCamera();
-  },[]);
+  }, []);
 
   const uploadImage = async () => {
     if (!imageUri) {
@@ -79,7 +79,7 @@ export default function NextScreen({ navigation }) {
 
     try {
       const response = await axios.post(
-        `http://172.20.10.3:3000/api/images/uploads`,
+        `https://m66pnkvf-3000.asse.devtunnels.ms/api/images/uploads`,
         formData,
         {
           headers: {
@@ -88,8 +88,8 @@ export default function NextScreen({ navigation }) {
         }
       );
       alert("Image uploaded successfully.");
-      navigation.navigate("MedBag",{uploaded: true});
-      
+      navigation.navigate("MedBag", { uploaded: true });
+
     } catch (error) {
       console.error("error uoloading image:", error);
       alert("Failed to uplad image or fetch OCR data");
@@ -108,7 +108,7 @@ export default function NextScreen({ navigation }) {
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
-        
+
           backgroundColor: "#F5F5F5",
           paddingVertical: 20,
         }}
@@ -116,7 +116,7 @@ export default function NextScreen({ navigation }) {
         <View
           style={{
             flexDirection: "row",
-            justifyItems:"flex-start",
+            justifyItems: "flex-start",
             alignItems: "center",
             marginTop: 60,
             marginLeft: 20,
